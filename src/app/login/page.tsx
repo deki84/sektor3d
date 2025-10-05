@@ -82,7 +82,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-3 flex items-center justify-center">
-            <img src="/logo.png" alt="Logo" className="h-12 w-auto" />
+            <img src="./logo.png" alt="Logo" className="h-12 w-auto" />
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">Anmelden</h1>
           <p className="mt-1 text-sm text-slate-600">
@@ -130,9 +130,7 @@ export default function LoginPage() {
                 </button>
               </div>
               <div className="mt-2 text-right">
-                <a href="/forgot-password" className="text-xs text-slate-600 hover:underline">
-                  Passwort vergessen?
-                </a>
+                <a href="/forgot-password" className="text-xs text-slate-600 hover:underline"></a>
               </div>
             </div>
 

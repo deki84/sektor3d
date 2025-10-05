@@ -1,69 +1,23 @@
 {
-  "name": "sektor3-d",
-  "version": "1.0.0",
-  "description": "A blank template to get started with Payload 3.0",
-  "license": "MIT",
-  "type": "module",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
-    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
-    "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
-    "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
-    "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
-    "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
-    "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
-    "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
-    "test": "pnpm run test:int && pnpm run test:e2e",
-    "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --no-experimental-strip-types\" pnpm exec playwright test",
-    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
+    "dev": "NODE_OPTIONS='--experimental-loader undici/register' next dev",
+    "build": "next build",
+    "start": "next start"
   },
   "dependencies": {
-    "@payloadcms/db-postgres": "3.58.0",
-    "@payloadcms/next": "3.58.0",
-    "@payloadcms/payload-cloud": "3.58.0",
-    "@payloadcms/richtext-lexical": "3.58.0",
-    "@payloadcms/ui": "3.58.0",
-    "cross-env": "^7.0.3",
-    "dotenv": "16.4.7",
-    "graphql": "^16.8.1",
-    "next": "15.4.4",
-    "payload": "3.58.0",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "sharp": "0.34.2"
+    "@payloadcms/db-postgres": "^3.58.0",
+    "@payloadcms/richtext-lexical": "^3.58.0",
+    "next": "^15.5.4",
+    "payload": "^3.58.0",
+    "pg": "^8.16.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "sharp": "^0.34.4"
   },
   "devDependencies": {
-    "@playwright/test": "1.54.1",
-    "@tailwindcss/postcss": "^4.1.14",
-    "@testing-library/react": "16.3.0",
-    "@types/node": "^22.5.4",
-    "@types/react": "19.1.8",
-    "@types/react-dom": "19.1.6",
-    "@vitejs/plugin-react": "4.5.2",
-    "autoprefixer": "^10.4.21",
-    "css-loader": "^7.1.2",
-    "eslint": "^9.16.0",
-    "eslint-config-next": "15.4.4",
-    "jsdom": "26.1.0",
-    "playwright": "1.54.1",
-    "playwright-core": "1.54.1",
-    "postcss": "^8.5.6",
-    "postcss-loader": "^8.2.0",
-    "prettier": "^3.4.2",
-    "tailwindcss": "^4.1.14",
-    "typescript": "5.7.3",
-    "vite-tsconfig-paths": "5.1.4",
-    "vitest": "3.2.3"
-  },
-  "engines": {
-    "node": "^18.20.2 || >=20.9.0",
-    "pnpm": "^9 || ^10"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "sharp",
-      "esbuild",
-      "unrs-resolver"
-    ]
+    "@types/next": "^9.0.0",
+    "@types/node": "^24.6.2",
+    "@types/react": "^19.2.0",
+    "typescript": "^5.9.3"
   }
 }
