@@ -1,11 +1,13 @@
 {
   "scripts": {
-    "dev": "NODE_OPTIONS='--experimental-loader undici/register' next dev",
+    "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "types": "payload generate:types"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.58.0",
+    "@payloadcms/next": "^3.58.0",
     "@payloadcms/richtext-lexical": "^3.58.0",
     "next": "^15.5.4",
     "payload": "^3.58.0",
@@ -15,9 +17,14 @@
     "sharp": "^0.34.4"
   },
   "devDependencies": {
-    "@types/next": "^9.0.0",
+    "@tailwindcss/postcss": "^4.1.14",
     "@types/node": "^24.6.2",
     "@types/react": "^19.2.0",
-    "typescript": "^5.9.3"
+    "autoprefixer": "^10.4.21",
+    "postcss-flexbugs-fixes": "^5.0.2",
+    "postcss-preset-env": "^10.4.0",
+    "tailwindcss": "^4.1.14",
+    "typescript": "^5.9.3",
+    "undici": "6.19.8"
   }
 }
