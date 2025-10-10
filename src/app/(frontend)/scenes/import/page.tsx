@@ -70,7 +70,7 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
     fd.append('name', name)
 
     const xhr = new XMLHttpRequest()
-    const url = `${process.env.NEXT_PUBLIC_SERVER_URL}/app-api/import/gltf`
+    const url = `${process.env.NEXT_PUBLIC_SERVER_URL}/api/import/gltf`
     xhr.open('POST', url, true)
 
     xhr.upload.onprogress = (ev) => {
