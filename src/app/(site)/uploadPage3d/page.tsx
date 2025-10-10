@@ -21,7 +21,7 @@ async function getScenes(): Promise<Scene[]> {
   return Array.isArray(data) ? data : []
 }
 
-export default async function WalkthroughPage() {
+export default async function uploadPage3d() {
   const scenes = await getScenes()
 
   return (
