@@ -1,5 +1,5 @@
-import ThreeDViewerGLTF from '@/components/ui/ThreeDViewerGltf'
-import { getSceneById } from '@/lib/data/scenes'
+import ThreeDViewerGLTF from '@/app/components/ui/ThreeDViewerGltf'
+import { getSceneById } from '@/app/lib/data/scenes'
 import type { Scene } from '@/payload-types'
 import { redirect } from 'next/navigation'
 
