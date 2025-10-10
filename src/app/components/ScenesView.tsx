@@ -7,8 +7,8 @@
 import { useState, startTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import ImportGLTFPage from '@/app/(frontend)/scenes/import/page'
-import SceneCard from '@/components/SceneCard'
-import { importScene, deleteScene } from '@/app/actions/actions'
+import SceneCard from '@/app/components/SceneCard'
+import { deleteScene } from '@/app/actions/actions'
 import slugify from 'slugify'
 
 type Scene = {
