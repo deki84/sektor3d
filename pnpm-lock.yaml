@@ -69,6 +69,9 @@ importers:
       fiber:
         specifier: link:@types/react-three/fiber
         version: link:@types/react-three/fiber
+      payload-types:
+        specifier: link:@/payload-types
+        version: link:@/payload-types
       postcss-flexbugs-fixes:
         specifier: ^5.0.2
         version: 5.0.2(postcss@8.5.6)
