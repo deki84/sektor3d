@@ -9,7 +9,7 @@ type Scene = { scene_uuid: string; title: string; cover?: string; slug?: string 
 const BASE = process.env.NEXT_PUBLIC_SERVER_URL ?? ''
 
 export async function importScene(newScene: Omit<Scene, 'scene_uuid'>) {
-  const res = await fetch(`${BASE}/app-api/scenes`, {
+  const res = await fetch(`${BASE}/api/scenes`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(newScene),

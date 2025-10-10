@@ -11,7 +11,7 @@ type Scene = {
 
 async function getScenes(): Promise<Scene[]> {
   const base = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
-  const res = await fetch(`${base}/app-api/scenes`, { next: { tags: ['scenes'] } })
+  const res = await fetch(`${base}/api/scenes`, { next: { tags: ['scenes'] } })
 
   if (!res.ok) {
     throw new Error('Failed to fetch scenes')

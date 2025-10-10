@@ -7,7 +7,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: 'NEXT_PUBLIC_PAYLOAD_URL fehlt' }, { status: 500 })
   }
 
-  const res = await fetch(`${payloadUrl}/api/login`, {
+  const res = await fetch(`${payloadUrl}/api/users/login`, {
+    // ← so muss es sein
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

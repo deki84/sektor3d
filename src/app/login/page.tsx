@@ -15,7 +15,7 @@ function Spinner() {
 export default function LoginPage() {
   const router = useRouter()
   const search = useSearchParams()
-  const nextUrl = search.get('next') || '/uploadPage3ds'
+  const nextUrl = search.get('next') || '/uploadPage3d'
   const prefill = search.get('email') || ''
 
   const [email, setEmail] = useState(prefill)
