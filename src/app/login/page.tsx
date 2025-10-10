@@ -36,7 +36,7 @@ export default function LoginPage() {
         password: password,
       }
 
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -62,7 +62,9 @@ export default function LoginPage() {
         data?.reason === 'user-not-found'
       ) {
         router.replace(
-          `/register?email=${encodeURIComponent(payload.email)}&next=${encodeURIComponent(nextUrl)}`,
+          `/register?email=${encodeURIComponent(payload.email)}&next=${encodeURIComponent(
+            nextUrl,
+          )}`,
         )
         return
       }
@@ -154,7 +156,9 @@ export default function LoginPage() {
             Kein Konto?{' '}
             <a
               className="font-medium text-blue-600 underline-offset-4 hover:underline"
-              href={`/register?email=${encodeURIComponent(email.trim().toLowerCase() || '')}&next=${encodeURIComponent(nextUrl)}`}
+              href={`/register?email=${encodeURIComponent(
+                email.trim().toLowerCase() || '',
+              )}&next=${encodeURIComponent(nextUrl)}`}
             >
               Jetzt registrieren
             </a>
