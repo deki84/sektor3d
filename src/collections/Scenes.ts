@@ -19,6 +19,10 @@ export const Scenes: CollectionConfig = {
         { label: 'iFrame Embed', value: 'iframe' },
       ],
     },
+    {
+      name: 'scene_uuid',
+      type: 'text',
+    },
 
     {
       name: 'gltfFileUrl',

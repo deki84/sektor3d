@@ -31,6 +31,11 @@ const nextConfig = {
   reactStrictMode: true,
   redirects,
   experimental: { serverActions: { bodySizeLimit: '100mb' } },
+},
+async rewrites() {S
+  return [
+    { source: '/', destination: '/login' },
+  ]
 }
 
 export default withPayload(nextConfig, { devBundleServerPackages: false })

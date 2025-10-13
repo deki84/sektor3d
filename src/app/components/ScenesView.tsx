@@ -88,11 +88,7 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
         console.warn('Kein Ordner ermittelbar.')
         return
       }
-      router.push(
-        `/editor?scene_uuid=${encodeURIComponent(scene.scene_uuid)}&folder=${encodeURIComponent(
-          folder,
-        )}`,
-      )
+      router.push(`/viewer?scene_uuid=${encodeURIComponent(scene.scene_uuid)}`)
 
       // Optionale Fehlerbehandlung, falls die ID fehlt (z.B. bei temp. optimistischer Szene)
       console.error('Fehler: Kann Szene nicht bearbeiten, da scene_uuid fehlt.')
