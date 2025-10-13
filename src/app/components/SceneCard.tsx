@@ -18,7 +18,7 @@ export default function SceneCard({ scene, onEdit, onDelete }: SceneCardProps) {
     <article className="relative rounded-xl border bg-white shadow-sm overflow-hidden">
       {/* Cover Bild */}
       {scene.cover ? (
-        <img src={scene.cover} alt={scene.title} className="w-full h-32 object-cover" />
+        <img src="./security.jpg" alt={scene.title} className="w-full h-32 object-cover" />
       ) : (
         <div className="w-full h-32 bg-slate-100 flex items-center justify-center text-slate-400">
           No Cover
