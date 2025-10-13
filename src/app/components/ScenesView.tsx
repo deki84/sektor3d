@@ -79,21 +79,26 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
   }
 
   function handleEdit(scene: any) {
-    if (scene.scene_uuid) {
-      const folder =
-        (scene.folder && scene.folder.trim()) ||
-        slugify(scene.title ?? '', { lower: true, strict: true, trim: true })
-
-      if (!folder) {
-        console.warn('Kein Ordner ermittelbar.')
-        return
-      }
-      router.push(`/viewer?scene_uuid=${encodeURIComponent(scene.scene_uuid)}`)
-
-      // Optionale Fehlerbehandlung, falls die ID fehlt (z.B. bei temp. optimistischer Szene)
+    const id = scene?.scene_uuid?.toString?.()
+    if (!id) {
       console.error('Fehler: Kann Szene nicht bearbeiten, da scene_uuid fehlt.')
-      // Hier könntest du eine Benachrichtigung anzeigen
+      return
     }
+
+    // Ordner: erst Szene-Feld, sonst Slug aus Titel, sonst Fallback 'upload'
+    const folderName =
+      (scene?.folder && String(scene.folder).trim()) ||
+      slugify(scene?.title ?? '', { lower: true, strict: true, trim: true }) ||
+      'upload'
+
+    // Optional: GLB statt GLTF?
+    const ext = scene?.viewerType === 'glb' ? '&ext=glb' : ''
+
+    router.push(
+      `/viewer?scene_uuid=${encodeURIComponent(id)}&folder=${encodeURIComponent(
+        folderName,
+      )}${ext}&v=${Date.now()}`,
+    )
   }
 
   return (

@@ -34,7 +34,7 @@ export async function importScene(newScene: Omit<Scene, 'scene_uuid'>) {
 }
 
 export async function deleteScene(scene_uuid: string) {
-  const res = await fetch(`${BASE}/app-api/delete-scene/${scene_uuid}`, { method: 'DELETE' })
+  const res = await fetch(`${BASE}/api/delete-scene/${scene_uuid}`, { method: 'DELETE' })
   if (!res.ok) {
     const text = await res.text().catch(() => '')
     throw new Error(`Löschen fehlgeschlagen (${res.status}): ${text}`)

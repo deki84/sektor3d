@@ -1,7 +1,21 @@
 import ThreeDViewerGLTF from '@/app/components/ui/ThreeDViewerGltf'
 import { getSceneById } from '@/app/lib/data/scenes'
-import type { Scene } from '@/payload-types'
 import { redirect } from 'next/navigation'
+
+type Scene = {
+  id: number
+  title: string
+  slug: string
+  viewerType: 'gltf' | 'shapespark' | 'iframe'
+  scene_uuid?: string
+  gltfFileUrl?: string
+  shapesparkURL?: string
+  iframeCode?: string
+  cover?: string
+  published: boolean
+  updatedAt: string
+  createdAt: string
+}
 
 export default async function ScenePage({ params }: { params: Promise<{ scene_uuid: string }> }) {
   const { scene_uuid } = await params // ✅ params zuerst awaiten
