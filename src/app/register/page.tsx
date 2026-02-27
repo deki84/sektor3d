@@ -2,21 +2,14 @@
 
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { Eye, EyeOff, Loader2, Lock, Mail, User } from 'lucide-react'
 
+// ─── Spinner-Komponente ──────────────────────────────────────────────────────
 function Spinner() {
-  return (
-    <svg
-      className="h-5 w-5 animate-spin text-white"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-    </svg>
-  )
+  return <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
 }
 
+// ─── Registrierungs-Seite ─────────────────────────────────────────────────────
 export default function RegisterPage() {
   const router = useRouter()
   const search = useSearchParams()
@@ -36,6 +29,7 @@ export default function RegisterPage() {
     e.preventDefault()
     setError(null)
 
+    // Passwort-Validierung vor dem Request
     if (password.length < 8) {
       setError('Das Passwort muss mindestens 8 Zeichen lang sein.')
       return
@@ -47,7 +41,7 @@ export default function RegisterPage() {
 
     setLoading(true)
     try {
-      // 1) User anlegen!
+      // 1) Neuen User anlegen
       const reg = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -61,7 +55,7 @@ export default function RegisterPage() {
         return
       }
 
-      // 2) Auto-Login
+      // 2) Auto-Login nach erfolgreicher Registrierung
       const login = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -71,6 +65,7 @@ export default function RegisterPage() {
       if (login.ok) {
         router.replace(nextUrl)
       } else {
+        // Fallback: zur Login-Seite mit vorgefüllter E-Mail
         router.replace(
           `/login?email=${encodeURIComponent(email)}&next=${encodeURIComponent(nextUrl)}`,
         )
@@ -82,100 +77,128 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-50 via-white to-slate-100 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-lg">
-        <div className="mb-6 text-center">
-          <h1 className="text-2xl font-semibold">Konto erstellen</h1>
-          <p className="mt-1 text-sm text-slate-600">Registriere dich, um fortzufahren</p>
+    // Hintergrund: dunkler Verlauf, konsistent mit Login-Seite
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 px-4 py-8">
+      <div className="w-full max-w-md">
+
+        {/* Logo & Überschrift */}
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 flex items-center justify-center">
+            <img src="./logo.png" alt="Sektor3D Logo" className="h-14 w-auto drop-shadow-lg" />
+          </div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Konto erstellen</h1>
+          <p className="mt-1 text-sm text-slate-400">Registrieren Sie sich, um fortzufahren</p>
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">Name</label>
-            <input
-              className="w-full rounded-xl border border-slate-300 px-3 py-2 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Max Mustermann"
-              required
-            />
-          </div>
+        {/* Formular-Karte */}
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-sm ring-1 ring-white/10">
+          <form onSubmit={onSubmit} className="space-y-5">
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">E-Mail</label>
-            <input
-              type="email"
-              className="w-full rounded-xl border border-slate-300 px-3 py-2 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="max@example.com"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">Passwort</label>
-            <div className="relative">
-              <input
-                type={showPw ? 'text' : 'password'}
-                className="w-full rounded-xl border border-slate-300 px-3 py-2 pr-10 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Mind. 8 Zeichen"
-                minLength={8}
-                required
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-2 grid place-items-center rounded-md px-2 text-slate-500 hover:text-slate-700"
-                onClick={() => setShowPw((v) => !v)}
-                aria-label="Passwort anzeigen"
-                title="Passwort anzeigen"
-              >
-                {showPw ? '👁️' : '👁️‍🗨️'}
-              </button>
+            {/* Name Feld */}
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-300">Name</label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                <input
+                  className="w-full rounded-xl border border-white/10 bg-white/10 pl-10 pr-4 py-2.5 text-white placeholder:text-slate-500 shadow-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Max Mustermann"
+                  required
+                  autoFocus
+                />
+              </div>
             </div>
-          </div>
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Passwort bestätigen
-            </label>
-            <input
-              type={showPw ? 'text' : 'password'}
-              className="w-full rounded-xl border border-slate-300 px-3 py-2 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              placeholder="Nochmals eingeben"
-              minLength={8}
-              required
-            />
-          </div>
-
-          {error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-              {error}
+            {/* E-Mail Feld */}
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-300">E-Mail</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                <input
+                  type="email"
+                  className="w-full rounded-xl border border-white/10 bg-white/10 pl-10 pr-4 py-2.5 text-white placeholder:text-slate-500 shadow-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="max@example.com"
+                  required
+                />
+              </div>
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 font-medium text-white shadow-sm transition hover:opacity-90 disabled:opacity-60"
-          >
-            {loading && <Spinner />}
-            <span>{loading ? 'Wird erstellt…' : 'Konto erstellen'}</span>
-          </button>
-        </form>
+            {/* Passwort Feld */}
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-300">Passwort</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                <input
+                  type={showPw ? 'text' : 'password'}
+                  className="w-full rounded-xl border border-white/10 bg-white/10 pl-10 pr-11 py-2.5 text-white placeholder:text-slate-500 shadow-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Mind. 8 Zeichen"
+                  minLength={8}
+                  required
+                />
+                {/* Passwort ein-/ausblenden */}
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-3 flex items-center text-slate-500 hover:text-slate-300 transition"
+                  onClick={() => setShowPw((v) => !v)}
+                  aria-label="Passwort anzeigen"
+                >
+                  {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
 
-        <div className="mt-6 text-center text-sm text-slate-600">
-          Bereits ein Konto?{' '}
-          <a
-            href={`/login?email=${encodeURIComponent(email || '')}&next=${encodeURIComponent(nextUrl)}`}
-            className="font-medium text-blue-600 hover:underline"
-          >
-            Anmelden
-          </a>
+            {/* Passwort bestätigen */}
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-300">
+                Passwort bestätigen
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                <input
+                  type={showPw ? 'text' : 'password'}
+                  className="w-full rounded-xl border border-white/10 bg-white/10 pl-10 pr-4 py-2.5 text-white placeholder:text-slate-500 shadow-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30"
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                  placeholder="Nochmals eingeben"
+                  minLength={8}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Fehlermeldung */}
+            {error && (
+              <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                {error}
+              </div>
+            )}
+
+            {/* Submit-Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 font-semibold text-white shadow-lg shadow-indigo-900/30 transition hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading && <Spinner />}
+              <span>{loading ? 'Wird erstellt…' : 'Konto erstellen'}</span>
+            </button>
+          </form>
+
+          {/* Link zur Login-Seite */}
+          <div className="mt-6 text-center text-sm text-slate-400">
+            Bereits ein Konto?{' '}
+            <a
+              href={`/login?email=${encodeURIComponent(email || '')}&next=${encodeURIComponent(nextUrl)}`}
+              className="font-medium text-indigo-400 hover:text-indigo-300 underline-offset-4 hover:underline transition"
+            >
+              Anmelden
+            </a>
+          </div>
         </div>
       </div>
     </div>
