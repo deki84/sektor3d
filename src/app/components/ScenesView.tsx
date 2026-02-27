@@ -1,11 +1,16 @@
 'use client'
 
-// Diese Client-Komponente rendert die Karten, öffnet das Import-Modal,
-// führt Mutationen über Server Actions aus, zeigt neue Karten sofort optimistisch
-// und triggert anschließend einen Refresh, damit die Server-Seite frische Daten zieht.
+// ─── ScenesView ───────────────────────────────────────────────────────────────
+// Client-Komponente für das Szenen-Grid.
+// Aufgaben:
+//  - Rendert alle Szenen-Karten
+//  - Öffnet das Import-Modal
+//  - Führt optimistisches UI-Update beim Import/Löschen durch
+//  - Triggert nach Mutation einen Router-Refresh für frische Serverdaten
 
 import { useState, startTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { Plus } from 'lucide-react'
 import ImportGLTFPage from '@/app/(frontend)/scenes/import/page'
 import SceneCard from '@/app/components/SceneCard'
 import { deleteScene } from '@/app/actions/actions'
@@ -23,46 +28,47 @@ interface ScenesViewProps {
 }
 
 export default function ScenesView({ initialScenes }: ScenesViewProps) {
-  // Lokaler State, damit optimistisches Update sofort sichtbar ist
+  // Lokaler State für optimistisches UI – wird sofort bei Import/Delete aktualisiert
   const [scenes, setScenes] = useState<Scene[]>(() => initialScenes ?? [])
   const [openImport, setOpenImport] = useState(false)
   const router = useRouter()
 
+  // Synchronisiere lokalen State, wenn Server neue Daten liefert
   useEffect(() => {
     setScenes(initialScenes ?? [])
   }, [initialScenes])
 
-  // Import-Handler: optimistisches Hinzufügen + Server Action + Refresh
+  // ── Import-Handler ─────────────────────────────────────────────────────────
+  // Fügt die neue Szene sofort optimistisch ein und ersetzt sie nach Serverantwort
   const handleImport = async (saved: Scene) => {
     const tempId = `temp-${Date.now()}`
     const optimistic: Scene = { ...saved, scene_uuid: tempId }
 
-    // Sofort anzeigen
+    // Sofort im UI anzeigen
     setScenes((prev) => [optimistic, ...prev])
 
     try {
-      // Serverseitig speichern
-
-      // Temporären Eintrag durch echten ersetzen (id muss vorhanden sein)
       if (saved?.scene_uuid) {
+        // Temporären Eintrag durch den echten ersetzen
         setScenes((prev) => prev.map((s) => (s.scene_uuid === tempId ? saved : s)))
       } else {
-        // Falls keine id zurückkommt: wieder entfernen
+        // Kein UUID vom Backend → optimistischen Eintrag zurückrollen
         setScenes((prev) => prev.filter((s) => s.scene_uuid !== tempId))
         console.error('Import ok, aber keine id erhalten')
       }
       startTransition(() => {
         setOpenImport(false)
-        router.refresh()
+        router.refresh() // Serverdaten aktualisieren
       })
     } catch (e) {
-      // Bei Fehler: zurückrollen
+      // Fehler → Rollback
       setScenes((prev) => prev.filter((s) => s.scene_uuid !== tempId))
       console.error('Import fehlgeschlagen:', e)
     }
   }
 
-  // Lösch-Handler: optimistisch entfernen + Server Action + ggf. Rollback
+  // ── Lösch-Handler ──────────────────────────────────────────────────────────
+  // Entfernt die Szene sofort aus dem UI und rollt bei Fehler zurück
   const handleDelete = async (sceneToDelete: Scene) => {
     const backup = scenes
     setScenes((prev) => prev.filter((s) => s.scene_uuid !== sceneToDelete.scene_uuid))
@@ -72,12 +78,14 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
       }
       startTransition(() => router.refresh())
     } catch (e) {
-      // Rollback wenn Löschen fehlschlägt
+      // Rollback wenn Löschen serverseitig fehlschlägt
       setScenes(backup)
       console.error('Löschen fehlgeschlagen:', e)
     }
   }
 
+  // ── Edit-Handler ───────────────────────────────────────────────────────────
+  // Navigiert zum 3D-Viewer mit den Parametern der Szene
   function handleEdit(scene: any) {
     const id = scene?.scene_uuid?.toString?.()
     if (!id) {
@@ -91,35 +99,49 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
       slugify(scene?.title ?? '', { lower: true, strict: true, trim: true }) ||
       'upload'
 
-    // Optional: GLB statt GLTF?
     const ext = scene?.viewerType === 'glb' ? '&ext=glb' : ''
 
     router.push(
-      `/viewer?scene_uuid=${encodeURIComponent(id)}&folder=${encodeURIComponent(
-        folderName,
-      )}${ext}&v=${Date.now()}`,
+      `/viewer?scene_uuid=${encodeURIComponent(id)}&folder=${encodeURIComponent(folderName)}${ext}&v=${Date.now()}`,
     )
   }
 
   return (
     <section className="flex-1 p-6 md:p-10">
-      <h1 className="mb-6 text-3xl font-semibold">Szenen</h1>
 
-      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-        {/* Import-Button öffnet das Modal */}
+      {/* ── Seitenkopf ──────────────────────────────────────────────── */}
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Szenen</h1>
+          <p className="mt-0.5 text-sm text-slate-500">{scenes.length} Szene{scenes.length !== 1 ? 'n' : ''} vorhanden</p>
+        </div>
+        {/* Import-Button in der Kopfzeile (alternativ zum Karten-Button) */}
         <button
           onClick={() => setOpenImport(true)}
-          className="group flex h-56 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-white text-slate-600 shadow-sm transition hover:border-indigo-400 hover:text-indigo-600"
+          className="hidden sm:flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow transition hover:bg-indigo-500"
+        >
+          <Plus className="h-4 w-4" />
+          Importieren
+        </button>
+      </div>
+
+      {/* ── Szenen-Grid ─────────────────────────────────────────────── */}
+      <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+
+        {/* Import-Button als Karte (immer sichtbar, auch auf Mobile) */}
+        <button
+          onClick={() => setOpenImport(true)}
+          className="group flex h-56 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-700 bg-slate-800/50 text-slate-500 transition hover:border-indigo-500 hover:text-indigo-400"
           aria-label="Neue Szene importieren"
         >
-          <div className="mb-3 grid h-14 w-14 place-items-center rounded-full bg-indigo-100 transition group-hover:bg-indigo-200">
-            <span className="text-2xl">📥</span>
+          <div className="mb-3 grid h-12 w-12 place-items-center rounded-xl bg-slate-700 transition group-hover:bg-indigo-600/20">
+            <Plus className="h-5 w-5 transition group-hover:text-indigo-400" />
           </div>
           <div className="text-sm font-medium">Szene importieren</div>
-          <div className="mt-1 text-xs text-slate-400">.gltf .bin</div>
+          <div className="mt-1 text-xs text-slate-600">.gltf · .glb · .bin</div>
         </button>
 
-        {/* Karten aus dem lokalen State (wichtig für optimistisches UI) */}
+        {/* Szenen-Karten (aus lokalem State für optimistisches UI) */}
         {scenes.map((s, index) => (
           <SceneCard
             key={s.scene_uuid ?? `${s.title}-${index}`}
@@ -130,11 +152,10 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
         ))}
       </div>
 
-      {/* Import-Modal */}
+      {/* ── Import-Modal ────────────────────────────────────────────── */}
       {openImport && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-0">
-          <div className="w-full max-w-none sm:max-w-3xl">
-            {/* onImport MUSS in ImportGLTFPage beim Erfolg aufgerufen werden */}
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-lg">
             <ImportGLTFPage onClose={() => setOpenImport(false)} onImport={handleImport} />
           </div>
         </div>
