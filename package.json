@@ -38,6 +38,7 @@
     "@types/react-dom": "^19.2.1",
     "@types/three": "^0.180.0",
     "autoprefixer": "^10.4.21",
+    "dotenv": "^17.2.3",
     "fiber": "link:@types/react-three/fiber",
     "payload-types": "link:@/payload-types",
     "postcss-flexbugs-fixes": "^5.0.2",
