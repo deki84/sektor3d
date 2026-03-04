@@ -16,9 +16,6 @@ import { Scenes } from './collections/Scenes'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-console.log('SMTP_FROM:', process.env.SMTP_FROM)
-console.log('RESEND_API_KEY:', process.env.RESEND_API_KEY?.slice(0, 6))
-
 export default buildConfig({
   admin: {
     user: Users.slug,

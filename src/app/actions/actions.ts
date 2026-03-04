@@ -4,8 +4,6 @@ import { revalidateTag } from 'next/cache'
 
 type Scene = { scene_uuid: string; title: string; cover?: string; slug?: string }
 
-// Relativ fetchen vermeidet CORS/Env-Mismatches.
-// Falls deine API extern läuft, kannst du BASE wieder auf ENV umstellen.
 const BASE = process.env.NEXT_PUBLIC_PAYLOAD_URL ?? ''
 
 export async function importScene(newScene: Omit<Scene, 'scene_uuid'>) {
@@ -22,14 +20,11 @@ export async function importScene(newScene: Omit<Scene, 'scene_uuid'>) {
 
   const saved: Scene = await res.json()
 
-  // Muss eine id haben, sonst Karte nicht stabil renderbar
   if (!saved?.scene_uuid) {
     throw new Error('Import-Antwort enthält keine id')
   }
 
-  // Tag-Cache invalidieren (gehört zur Page-Fetch-Konfiguration)
-  revalidateTag('scenes')
-
+  revalidateTag('scenes', 'max')
   return saved
 }
 
@@ -40,6 +35,6 @@ export async function deleteScene(scene_uuid: string) {
     throw new Error(`Löschen fehlgeschlagen (${res.status}): ${text}`)
   }
 
-  revalidateTag('scenes')
+  revalidateTag('scenes', 'max')
   return true
 }

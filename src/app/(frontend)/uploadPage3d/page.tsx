@@ -1,7 +1,8 @@
-'use server'
-
 import ScenesView from '@/app/components/ScenesView'
 import Sidebar from '@/app/components/Sidebar'
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 type Scene = {
   scene_uuid?: string

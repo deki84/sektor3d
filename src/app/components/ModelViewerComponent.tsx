@@ -2,38 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-// ─── TypeScript declarations for the model-viewer web component ───────────────
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'model-viewer': React.DetailedHTMLProps<
-        React.HTMLAttributes<HTMLElement> & {
-          src?: string
-          alt?: string
-          /** HDR environment: "neutral" | "legacy" | URL to .hdr/.env */
-          'environment-image'?: string
-          /** 0 – 1 */
-          'shadow-intensity'?: string
-          /** 0 – 1 */
-          'shadow-softness'?: string
-          /** scene exposure, e.g. "1.0" */
-          exposure?: string
-          /** "commerce" | "aces" (model-viewer ≥ 3.5) */
-          'tone-mapping'?: string
-          /** present = orbit controls enabled */
-          'camera-controls'?: '' | boolean
-          /** "auto" (default) | "interaction" | "manual" */
-          reveal?: string
-          /** "eager" | "lazy" */
-          loading?: string
-        },
-        HTMLElement
-      >
-    }
-  }
-}
-// ─────────────────────────────────────────────────────────────────────────────
-
+// ─── TypeScript declarations for the model-viewer web component ────
 interface Props {
   modelUrl: string
 }
@@ -42,6 +11,10 @@ export default function ModelViewerComponent({ modelUrl }: Props) {
   const [isLoading, setIsLoading] = useState(true)
   const [progress, setProgress] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    import('@google/model-viewer')
+  }, [])
 
   useEffect(() => {
     const container = containerRef.current
@@ -85,32 +58,6 @@ export default function ModelViewerComponent({ modelUrl }: Props) {
           </span>
         </div>
       )}
-
-      {/* ── model-viewer ──────────────────────────────────────────────────── */}
-      {/*
-        Attributes used:
-          environment-image="neutral"  → built-in HDR neutral preset
-          shadow-intensity="1"         → full ground shadow
-          shadow-softness="0.8"        → soft shadow blur
-          exposure="1.0"               → scene exposure
-          tone-mapping="aces"          → ACES filmic tone mapping (≥ mv 3.5)
-          camera-controls=""           → orbit / pan / zoom enabled
-          loading="eager"              → start fetching immediately
-          reveal="auto"                → unhide as soon as loaded
-      */}
-      <model-viewer
-        src={modelUrl}
-        alt="3D Model"
-        environment-image="neutral"
-        shadow-intensity="1"
-        shadow-softness="0.8"
-        exposure="1.0"
-        tone-mapping="aces"
-        camera-controls=""
-        loading="eager"
-        reveal="auto"
-        style={{ width: '100vw', height: '100vh', backgroundColor: 'transparent' }}
-      />
     </div>
   )
 }
