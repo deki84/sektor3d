@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    scenes: Scene;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -77,6 +78,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    scenes: ScenesSelect<false> | ScenesSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -119,9 +121,11 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  name: string;
   updatedAt: string;
   createdAt: string;
   email: string;
+  roles?: ('admin' | 'user')[] | null;
   resetPasswordToken?: string | null;
   resetPasswordExpiration?: string | null;
   salt?: string | null;
@@ -155,6 +159,41 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "scenes".
+ */
+export interface Scene {
+  id: number;
+  title: string;
+  slug: string;
+  viewerType: 'gltf' | 'shapespark' | 'iframe';
+  scene_uuid?: string | null;
+  gltfFileUrl?: string | null;
+  shapesparkURL?: string | null;
+  iframeCode?: string | null;
+  cover?: string | null;
+  published?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "scenes_select".
+ */
+export interface ScenesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  viewerType?: T;
+  scene_uuid?: T;
+  gltfFileUrl?: T;
+  shapesparkURL?: T;
+  iframeCode?: T;
+  cover?: T;
+  published?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

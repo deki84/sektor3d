@@ -1,8 +1,11 @@
-// storage-adapter-import-placeholder
+// S3-Storage-Adapter für Media-Uploads
+import { s3Storage } from '@payloadcms/storage-s3'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
+import { resendAdapter } from '@payloadcms/email-resend'
+
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
@@ -13,9 +16,16 @@ import { Scenes } from './collections/Scenes'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+console.log('SMTP_FROM:', process.env.SMTP_FROM)
+console.log('RESEND_API_KEY:', process.env.RESEND_API_KEY?.slice(0, 6))
+
 export default buildConfig({
   admin: {
     user: Users.slug,
+    theme: 'light',
+    routes: {
+      reset: '/reset-password', // ← deine eigene Seite statt /admin/reset
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },
@@ -31,8 +41,27 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URI || '',
     },
   }),
+
+  email: resendAdapter({
+    defaultFromAddress: process.env.SMTP_FROM!,
+    defaultFromName: 'Sektor3D',
+    apiKey: process.env.RESEND_API_KEY!,
+  }),
+
   sharp,
   plugins: [
-    // storage-adapter-placeholder
+    // Media-Uploads gehen direkt in S3
+    s3Storage({
+      collections: { media: true },
+      bucket: process.env.S3_BUCKET!,
+      config: {
+        credentials: {
+          accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
+        },
+        region: process.env.S3_REGION ?? 'auto',
+        ...(process.env.S3_ENDPOINT ? { endpoint: process.env.S3_ENDPOINT } : {}),
+      },
+    }),
   ],
 })
