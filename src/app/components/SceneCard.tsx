@@ -12,6 +12,7 @@ function isImageUrl(url?: string): boolean {
 
 type Scene = {
   id?: string
+  scene_uuid?: string
   title: string
   cover?: string
   gltfFileUrl?: string

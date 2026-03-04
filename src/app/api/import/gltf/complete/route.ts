@@ -33,6 +33,7 @@ export async function POST(req: Request) {
         viewerType: 'gltf',
         // @ts-ignore - Falls generate:types noch nicht durchgelaufen ist
         r2Key: key,
+        gltfFileUrl: `${process.env.NEXT_PUBLIC_S3_BASE_URL}/${key}`,
         originalName,
         size,
         status: 'uploaded',
