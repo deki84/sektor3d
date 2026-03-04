@@ -1,5 +1,3 @@
-'use server'
-
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { headers as getHeaders } from 'next/headers'
@@ -8,6 +6,9 @@ import { Plus, ArrowRight, Layers } from 'lucide-react'
 import Link from 'next/link'
 import Sidebar from '@/app/components/Sidebar'
 import SceneCard from '@/app/components/SceneCard'
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 type Scene = {
   scene_uuid?: string
