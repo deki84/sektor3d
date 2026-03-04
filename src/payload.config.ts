@@ -42,6 +42,7 @@ export default buildConfig({
         '',
       ssl: { rejectUnauthorized: false },
     },
+    push: process.env.NODE_ENV !== 'production',
   }),
 
   email: resendAdapter({
