@@ -7,10 +7,10 @@ export const runtime = 'nodejs'
 
 const s3 = new S3Client({
   region: 'auto',
-  endpoint: process.env.R2_ENDPOINT,
+  endpoint: process.env.S3_ENDPOINT,
   credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
   },
 })
 
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
   const key = `uploads/${crypto.randomUUID()}.${ext}`
 
   const command = new PutObjectCommand({
-    Bucket: process.env.R2_BUCKET!,
+    Bucket: process.env.S3_BUCKET!,
     Key: key,
     ContentType: contentType,
   })
