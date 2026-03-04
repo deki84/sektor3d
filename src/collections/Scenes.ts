@@ -42,5 +42,28 @@ export const Scenes: CollectionConfig = {
 
     { name: 'cover', type: 'text' },
     { name: 'published', type: 'checkbox', defaultValue: false },
+    {
+      name: 'r2Key',
+      type: 'text',
+    },
+    {
+      name: 'originalName',
+      type: 'text',
+    },
+    {
+      name: 'size',
+      type: 'number',
+    },
+    {
+      name: 'status',
+      type: 'select',
+      options: [
+        { label: 'Uploaded', value: 'uploaded' },
+        { label: 'Processing', value: 'processing' },
+        { label: 'Ready', value: 'ready' },
+        { label: 'Failed', value: 'failed' },
+      ],
+      defaultValue: 'uploaded',
+    },
   ],
 }

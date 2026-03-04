@@ -17,6 +17,44 @@ type ImportGLTFPageProps = {
   onImport?: (scene: Scene) => void
 }
 
+async function uploadZipToR2(file: File, onProgress: (pct: number) => void) {
+  // 1) Presign holen (kleines JSON -> kein Limit)
+  const presignRes = await fetch('/api/r2/presign', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      filename: file.name,
+      contentType: file.type || 'application/zip',
+    }),
+  })
+
+  const { url, key } = await presignRes.json()
+  if (!url || !key) throw new Error('Presign failed')
+
+  // 2) Direkt zu R2 hochladen (XHR -> Fortschritt)
+  await new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('PUT', url, true)
+
+    xhr.upload.onprogress = (ev) => {
+      if (ev.lengthComputable) {
+        onProgress(Math.round((ev.loaded / ev.total) * 100))
+      }
+    }
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) resolve()
+      else reject(new Error(`Upload failed: ${xhr.status} ${xhr.statusText}`))
+    }
+
+    xhr.onerror = () => reject(new Error('Network error during upload'))
+    xhr.setRequestHeader('Content-Type', file.type || 'application/zip')
+    xhr.send(file)
+  })
+
+  return { key, size: file.size, originalName: file.name }
+}
+
 // ─── GLTF-Import Modal ────────────────────────────────────────────────────────
 // Ermöglicht das Hochladen einer ZIP-Datei, die eine .gltf-Datei enthält.
 // Zeigt Upload-Fortschritt an und ruft onImport mit der gespeicherten Szene auf.
@@ -45,7 +83,7 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
   }
 
   // ── Upload-Handler ──────────────────────────────────────────────────────
-  async function submit(e: React.FormEvent) {
+   async function submit(e: React.FormEvent) {
     e.preventDefault()
     if (!zip || !name) return
 
@@ -53,7 +91,6 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
     setProgress(0)
     setMsg('')
 
-    // Zuerst ZIP lokal validieren (spart unnötigen Upload-Traffic)
     const error = await validateZip(zip)
     if (error) {
       setMsg(error)
@@ -62,68 +99,53 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
       return
     }
 
-    const fd = new FormData()
-    fd.append('zip', zip)
-    fd.append('name', name)
+    try {
+      const uploaded = await uploadZipToR2(zip, (pct) => setProgress(pct))
 
-    // XMLHttpRequest für Upload-Fortschritt
-    const xhr = new XMLHttpRequest()
-    const url = `${process.env.NEXT_PUBLIC_PAYLOAD_URL}/api/import/gltf`
-    xhr.open('POST', url, true)
+      const res = await fetch('/api/import/gltf/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sceneName: name,
+          key: uploaded.key,
+          originalName: uploaded.originalName,
+          size: uploaded.size,
+        }),
+      })
 
-    // Fortschritts-Event: aktualisiert die Progressbar
-    xhr.upload.onprogress = (ev) => {
-      if (ev.lengthComputable) {
-        setProgress(Math.round((ev.loaded / ev.total) * 100))
-      }
-    }
+      const data = await res.json().catch(() => ({}))
 
-    // Antwort des Servers verarbeiten
-    xhr.onload = () => {
-      let ok = xhr.status >= 200 && xhr.status < 300
-      let importedScene: Scene | null = null
-
-      if (ok) {
-        try {
-          importedScene = JSON.parse(xhr.responseText) as Scene
-        } catch (err) {
-          console.error('Fehler beim Parsen der Backend-Antwort', err)
-          ok = false
-        }
+      if (!res.ok) {
+        setMsg(data?.message || data?.error || 'Import fehlgeschlagen')
+        setLoading(false)
+        setTimeout(() => setMsg(''), 3000)
+        return
       }
 
-      setMsg(ok ? 'Erfolgreich gespeichert' : `Fehler: ${xhr.statusText || 'Upload fehlgeschlagen'}`)
-      setLoading(false)
+      const importedScene = data as Scene
 
-      if (ok && importedScene?.scene_uuid) {
-        setProgress(100)
+      setMsg('Erfolgreich gespeichert')
+      setProgress(100)
+
+      if (importedScene?.scene_uuid) {
         onImport?.(importedScene)
-      } else if (ok) {
-        console.error('Backend-Import OK, aber keine scene_uuid im Objekt gefunden.')
       }
 
       setTimeout(() => {
         setMsg('')
-        if (ok) onClose?.()
-      }, 3000)
-    }
-
-    xhr.onerror = () => {
-      setMsg('Netzwerkfehler beim Upload')
-      setLoading(false)
+        onClose?.()
+      }, 1500)
+    } catch (err: any) {
+      console.error(err)
+      setMsg(err?.message || 'Netzwerkfehler beim Upload')
       setTimeout(() => setMsg(''), 3000)
+    } finally {
+      setLoading(false)
     }
-
-    xhr.send(fd)
   }
-
-  const isSuccess = msg && !msg.toLowerCase().startsWith('fehler')
-
+    const isSuccess = msg && !msg.toLowerCase().startsWith('fehler')
   return (
-    // Modal-Inhalt: dunkle Karte passend zum Dashboard-Design
     <div className="relative rounded-2xl bg-white border border-gray-200 shadow-2xl p-8">
-
-      {/* ── Schließen-Button ────────────────────────────────────────── */}
       <button
         type="button"
         onClick={onClose}
@@ -133,15 +155,14 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
         <X className="h-4 w-4" />
       </button>
 
-      {/* ── Kopfzeile ───────────────────────────────────────────────── */}
       <div className="mb-6">
         <h2 className="text-xl font-bold text-slate-900">GLTF Import</h2>
-        <p className="mt-1 text-sm text-slate-500">ZIP-Datei mit GLTF, BIN und Texturen hochladen</p>
+        <p className="mt-1 text-sm text-slate-500">
+          ZIP-Datei mit GLTF, BIN und Texturen hochladen
+        </p>
       </div>
 
       <form onSubmit={submit} className="space-y-5">
-
-        {/* ── Szenenname ──────────────────────────────────────────── */}
         <div>
           <label className="mb-1.5 block text-sm font-medium text-slate-700">Szenenname</label>
           <input
@@ -155,10 +176,7 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
 
         {/* ── Datei-Upload ────────────────────────────────────────── */}
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-slate-700">
-            ZIP-Datei
-          </label>
-          {/* Klick auf das Label öffnet den Dateidialog */}
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">ZIP-Datei</label>
           <label className="group flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-8 cursor-pointer transition hover:border-indigo-500 hover:bg-gray-100">
             <FileArchive className="h-8 w-8 text-slate-500 group-hover:text-indigo-400 transition" />
             <div className="text-center">
@@ -178,7 +196,6 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
           </label>
         </div>
 
-        {/* ── Upload-Button ───────────────────────────────────────── */}
         <button
           type="submit"
           className="w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 font-semibold text-white shadow transition hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -189,7 +206,6 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
         </button>
       </form>
 
-      {/* ── Fortschrittsbalken (nur während Upload sichtbar) ────────── */}
       {loading && (
         <div className="mt-5">
           <div className="mb-2 flex items-center justify-between text-xs text-slate-500">
@@ -207,14 +223,16 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
           </div>
         </div>
       )}
+      
 
-      {/* ── Status-Meldung (Erfolg / Fehler) ────────────────────────── */}
       {msg && (
-        <div className={`mt-5 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium ${
-          isSuccess
-            ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
-            : 'border-red-500/30 bg-red-500/10 text-red-400'
-        }`}>
+        <div
+          className={`mt-5 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium ${
+            isSuccess
+              ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+              : 'border-red-500/30 bg-red-500/10 text-red-400'
+          }`}
+        >
           <span>{isSuccess ? '✓' : '✗'}</span>
           <span>{msg}</span>
         </div>

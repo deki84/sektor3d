@@ -9,9 +9,9 @@ import { resendAdapter } from '@payloadcms/email-resend'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
-import { Users } from './collections/Users'
-import { Media } from './collections/Media'
-import { Scenes } from './collections/Scenes'
+import { Users } from './collections/Users.ts'
+import { Media } from './collections/Media.ts'
+import { Scenes } from './collections/Scenes.ts'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
