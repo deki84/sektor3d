@@ -1,19 +1,15 @@
 import React from 'react'
-import '../(frontend)/styles.css'
+import './styles.css'
 
 export const metadata = {
-  description: 'A blank template using Payload in a Next.js app.',
-  title: 'Payload Blank Template',
+  title: 'Sektor3D',
+  description: 'Sektor3D Platform',
 }
 
-export default async function RootLayout(props: { children: React.ReactNode }) {
-  const { children } = props
-
+export default function FrontendLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>
-        <main>{children}</main>
-      </body>
+    <html lang="de">
+      <body>{children}</body>
     </html>
   )
 }

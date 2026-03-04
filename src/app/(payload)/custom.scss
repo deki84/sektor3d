@@ -1,0 +1,43 @@
+// Light theme overrides for Payload CMS admin panel
+[data-theme='light'],
+:root {
+  // Backgrounds
+  --theme-elevation-0: #ffffff;
+  --theme-elevation-50: #f8f9fa;
+  --theme-elevation-100: #f1f3f5;
+  --theme-elevation-150: #e9ecef;
+  --theme-elevation-200: #dee2e6;
+  --theme-elevation-250: #ced4da;
+  --theme-elevation-300: #adb5bd;
+  --theme-elevation-400: #868e96;
+  --theme-elevation-500: #495057;
+  --theme-elevation-600: #343a40;
+  --theme-elevation-700: #212529;
+  --theme-elevation-800: #16191c;
+  --theme-elevation-900: #0d0f11;
+  --theme-elevation-1000: #000000;
+
+  // Background
+  --theme-bg: #ffffff;
+
+  // Text
+  --theme-text: #212529;
+  --theme-input-bg: #ffffff;
+  --theme-border-color: #dee2e6;
+}
+
+// Login page specific
+.login__content {
+  background-color: #ffffff;
+}
+
+// Nav / sidebar
+.nav {
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+}
+
+// Dashboard
+.dashboard {
+  background-color: #ffffff;
+}

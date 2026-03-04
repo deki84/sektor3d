@@ -1,4 +1,4 @@
-import '../(frontend)/layout'
+import '../layout'
 
 export const metadata = {
   title: 'Next.js',

@@ -4,7 +4,7 @@ import redirects from './redirects.mjs'
 
 // Quelle festlegen (öffentlich oder Vercel-URL, sonst localhost)
 const SERVER_URL =
-  process.env.NEXT_PUBLIC_SERVER_URL ??
+  process.env.NEXT_PUBLIC_PAYLOAD_URL ??
   (process.env.VERCEL_PROJECT_PRODUCTION_URL
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : 'http://localhost:3000')

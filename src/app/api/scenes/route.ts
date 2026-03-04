@@ -1,29 +1,30 @@
+// Szenen-CRUD via Payload Local API
 import { NextResponse } from 'next/server'
-import { supabase } from '@/app/lib/supabase/supabaseServer'
+import { getPayload } from 'payload'
+import configPromise from '@payload-config'
 
-// Handler für GET-Anfragen: Holt alle Szenen
 export async function GET() {
-  const { data, error } = await supabase.from('scenes').select('*')
-
-  if (error) {
-    console.error('Supabase-Fehler beim Abrufen der Szenen:', error)
-    return NextResponse.json({ error: 'Failed to fetch scenes' }, { status: 500 })
-  }
-  return NextResponse.json(data)
+  const payload = await getPayload({ config: configPromise })
+  const { docs } = await payload.find({ collection: 'scenes', limit: 200, depth: 0 })
+  return NextResponse.json(docs)
 }
 
-// Handler für POST-Anfragen: Speichert eine neue Szene
 export async function POST(request: Request) {
   try {
     const { title, cover } = await request.json()
+    const payload = await getPayload({ config: configPromise })
 
-    const { data, error } = await supabase.from('scenes').insert({ title, cover }).select().single()
+    const slug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '')
 
-    if (error) {
-      console.error('Supabase-Fehler', error)
-      return NextResponse.json({ error }, { status: 500 })
-    }
-    return NextResponse.json(data, { status: 201 })
+    const doc = await payload.create({
+      collection: 'scenes',
+      data: { title, cover: cover ?? '', slug, viewerType: 'gltf', scene_uuid: slug },
+    })
+
+    return NextResponse.json(doc, { status: 201 })
   } catch (e: any) {
     return NextResponse.json({ error: String(e?.message ?? e) }, { status: 400 })
   }

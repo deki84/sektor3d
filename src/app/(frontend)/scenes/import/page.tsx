@@ -68,7 +68,7 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
 
     // XMLHttpRequest für Upload-Fortschritt
     const xhr = new XMLHttpRequest()
-    const url = `${process.env.NEXT_PUBLIC_SERVER_URL}/api/import/gltf`
+    const url = `${process.env.NEXT_PUBLIC_PAYLOAD_URL}/api/import/gltf`
     xhr.open('POST', url, true)
 
     // Fortschritts-Event: aktualisiert die Progressbar
@@ -121,13 +121,13 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
 
   return (
     // Modal-Inhalt: dunkle Karte passend zum Dashboard-Design
-    <div className="relative rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl p-8">
+    <div className="relative rounded-2xl bg-white border border-gray-200 shadow-2xl p-8">
 
       {/* ── Schließen-Button ────────────────────────────────────────── */}
       <button
         type="button"
         onClick={onClose}
-        className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-lg border border-slate-700 bg-slate-800 text-slate-400 transition hover:bg-slate-700 hover:text-white"
+        className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-slate-500 transition hover:bg-gray-100 hover:text-slate-900"
         aria-label="Schließen"
       >
         <X className="h-4 w-4" />
@@ -135,17 +135,17 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
 
       {/* ── Kopfzeile ───────────────────────────────────────────────── */}
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-white">GLTF Import</h2>
-        <p className="mt-1 text-sm text-slate-400">ZIP-Datei mit GLTF, BIN und Texturen hochladen</p>
+        <h2 className="text-xl font-bold text-slate-900">GLTF Import</h2>
+        <p className="mt-1 text-sm text-slate-500">ZIP-Datei mit GLTF, BIN und Texturen hochladen</p>
       </div>
 
       <form onSubmit={submit} className="space-y-5">
 
         {/* ── Szenenname ──────────────────────────────────────────── */}
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-slate-300">Szenenname</label>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">Szenenname</label>
           <input
-            className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-white placeholder:text-slate-500 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-slate-900 placeholder:text-slate-500 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="z. B. Wohnzimmer, Auto, Gebäude"
@@ -155,14 +155,14 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
 
         {/* ── Datei-Upload ────────────────────────────────────────── */}
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-slate-300">
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">
             ZIP-Datei
           </label>
           {/* Klick auf das Label öffnet den Dateidialog */}
-          <label className="group flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-slate-700 bg-slate-800/50 p-8 cursor-pointer transition hover:border-indigo-500 hover:bg-slate-800">
+          <label className="group flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-8 cursor-pointer transition hover:border-indigo-500 hover:bg-gray-100">
             <FileArchive className="h-8 w-8 text-slate-500 group-hover:text-indigo-400 transition" />
             <div className="text-center">
-              <span className="text-sm font-medium text-slate-300">
+              <span className="text-sm font-medium text-slate-700">
                 {zip ? zip.name : 'Datei auswählen'}
               </span>
               <p className="mt-0.5 text-xs text-slate-500">
@@ -192,14 +192,14 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
       {/* ── Fortschrittsbalken (nur während Upload sichtbar) ────────── */}
       {loading && (
         <div className="mt-5">
-          <div className="mb-2 flex items-center justify-between text-xs text-slate-400">
+          <div className="mb-2 flex items-center justify-between text-xs text-slate-500">
             <div className="flex items-center gap-1.5">
               <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-indigo-500" />
               <span>Wird hochgeladen…</span>
             </div>
             <span>{progress}%</span>
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-700">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
             <div
               className="h-full rounded-full bg-indigo-500 transition-[width] duration-150 ease-out"
               style={{ width: `${progress}%` }}
