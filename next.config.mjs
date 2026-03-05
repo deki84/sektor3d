@@ -20,6 +20,7 @@ const nextConfig = {
       : [], // nichts, wenn keine URL
   },
   webpack: (config) => {
+    config.externals = [...(config.externals || []), 'cesium', 'gltf-pipeline'] // ← NEU
     config.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
       '.js': ['.ts', '.tsx', '.js', '.jsx'],
@@ -32,4 +33,5 @@ const nextConfig = {
   redirects,
   experimental: { serverActions: { bodySizeLimit: '100mb' } },
 }
+
 export default withPayload(nextConfig, { devBundleServerPackages: false })
