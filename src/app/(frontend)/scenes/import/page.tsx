@@ -77,8 +77,8 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
     const zipContent = await JSzip.loadAsync(buf)
     const entries = Object.keys(zipContent.files).map((f) => f.toLowerCase())
 
-    if (!entries.some((f) => f.endsWith('.gltf'))) {
-      return 'Fehler: Keine .gltf-Datei in der ZIP gefunden'
+    if (!entries.some((f) => f.endsWith('.gltf') || f.endsWith('.glb'))) {
+      return 'Fehler: Keine .gltf- oder .glb-Datei in der ZIP gefunden'
     }
     return null
   }
@@ -164,7 +164,7 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
       <div className="mb-6">
         <h2 className="text-xl font-bold text-slate-900">GLTF Import</h2>
         <p className="mt-1 text-sm text-slate-500">
-          ZIP-Datei mit GLTF, BIN und Texturen hochladen
+          ZIP-Datei mit GLTF/GLB, BIN und Texturen hochladen
         </p>
       </div>
 

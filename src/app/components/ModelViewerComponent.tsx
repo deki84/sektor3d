@@ -29,12 +29,18 @@ export default function ModelViewerComponent({ modelUrl }: Props) {
     setIsLoading(true)
     setProgress(0)
 
-    const onLoad = () => setIsLoading(false)
+    const onLoad = () => {
+      console.log('model-viewer loaded successfully:', modelUrl)
+      setIsLoading(false)
+    }
     const onProgress = (e: Event) => {
       const { totalProgress } = (e as CustomEvent<{ totalProgress: number }>).detail
       setProgress(Math.round(totalProgress * 100))
     }
-    const onError = () => setIsLoading(false)
+    const onError = (e: Event) => {
+      console.error('model-viewer error:', (e as CustomEvent).detail ?? e)
+      setIsLoading(false)
+    }
 
     viewer.addEventListener('load', onLoad)
     viewer.addEventListener('progress', onProgress)
@@ -49,6 +55,13 @@ export default function ModelViewerComponent({ modelUrl }: Props) {
 
   return (
     <div ref={containerRef} className="relative w-screen h-screen bg-neutral-100">
+      {/* @ts-expect-error model-viewer is a custom web component */}
+      <model-viewer
+        src={modelUrl}
+        camera-controls
+        auto-rotate
+        style={{ width: '100%', height: '100%' }}
+      />
       {/* ── Loading overlay ───────────────────────────────────────────────── */}
       {isLoading && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-neutral-100">

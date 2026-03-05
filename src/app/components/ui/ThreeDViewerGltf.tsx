@@ -10,7 +10,7 @@ function Model({ url }: { url: string }) {
 
 export default function ThreeDViewerGLTF({ url }: { url: string }) {
   if (!url) return <div>Keine 3D-Datei gefunden.</div>
-  if (!url.endsWith('.gltf')) return <div>Nur .gltf wird unterstützt.</div>
+  if (!url.endsWith('.gltf') && !url.endsWith('.glb')) return <div>Nur .gltf oder .glb wird unterstützt.</div>
 
   return (
     <div style={{ height: 360, border: '1px solid #e5e7eb', borderRadius: 8, overflow: 'hidden' }}>

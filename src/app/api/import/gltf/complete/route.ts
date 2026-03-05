@@ -104,13 +104,16 @@ export async function POST(req: Request) {
     const coverEntry = findCoverEntry(entries)
 
     let mainGLTF: string | null = null
+    let mainGLB: string | null = null
 
     for (const e of entries) {
       if (e.isDirectory) continue
       const rel = sanitize(e.entryName)
       if (!rel) continue
 
-      if (!mainGLTF && rel.toLowerCase().endsWith('.gltf')) mainGLTF = rel
+      const lower = rel.toLowerCase()
+      if (!mainGLTF && lower.endsWith('.gltf')) mainGLTF = rel
+      if (!mainGLB && lower.endsWith('.glb')) mainGLB = rel
 
       await s3.send(
         new PutObjectCommand({
@@ -122,13 +125,15 @@ export async function POST(req: Request) {
       )
     }
 
-    if (!mainGLTF) {
+    if (!mainGLTF && !mainGLB) {
       await payload.delete({ collection: 'scenes', id: scene.id })
-      return NextResponse.json({ error: 'No .gltf file found in ZIP' }, { status: 400 })
+      return NextResponse.json({ error: 'No .gltf or .glb file found in ZIP' }, { status: 400 })
     }
 
     const base = process.env.NEXT_PUBLIC_S3_BASE_URL
-    const gltfFileUrl = `${base}/scenes/${slug}/${sceneUuid}/${mainGLTF}`
+    // Prefer .gltf; fall back to .glb (uploaded directly, no pipeline processing needed)
+    const modelFile = mainGLTF ?? mainGLB!
+    const gltfFileUrl = `${base}/scenes/${slug}/${sceneUuid}/${modelFile}`
     const cover = coverEntry
       ? `${base}/scenes/${slug}/${sceneUuid}/${sanitize(coverEntry.entryName)}`
       : ''
@@ -147,6 +152,7 @@ export async function POST(req: Request) {
       scene_uuid: updated.scene_uuid,
       title: updated.title,
       cover: updated.cover,
+      gltfFileUrl: updated.gltfFileUrl,
       slug: updated.slug,
     })
   } catch (error: any) {
