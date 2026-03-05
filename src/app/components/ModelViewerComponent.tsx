@@ -13,7 +13,9 @@ export default function ModelViewerComponent({ modelUrl }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    import('@google/model-viewer')
+    if (typeof window !== 'undefined' && !customElements.get('model-viewer')) {
+      import('@google/model-viewer').catch(console.error)
+    }
   }, [])
 
   useEffect(() => {

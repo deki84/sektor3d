@@ -28,7 +28,24 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    setScenes(initialScenes ?? [])
+    setScenes((prev) => {
+      const prevMap = new Map(prev.map((s) => [s.scene_uuid, s]))
+      const serverIds = new Set((initialScenes ?? []).map((s) => s.scene_uuid))
+      // Preserve optimistic (temp) scenes not yet reflected in the server response
+      const tempScenes = prev.filter(
+        (s) => s.scene_uuid?.startsWith('temp-') && !serverIds.has(s.scene_uuid),
+      )
+      // Merge server scenes, keeping cover/gltfFileUrl from optimistic state if server omits them
+      const merged = (initialScenes ?? []).map((s) => {
+        const optimistic = prevMap.get(s.scene_uuid)
+        return {
+          ...s,
+          cover: s.cover || optimistic?.cover,
+          gltfFileUrl: s.gltfFileUrl || optimistic?.gltfFileUrl,
+        }
+      })
+      return [...tempScenes, ...merged]
+    })
   }, [initialScenes])
 
   useEffect(() => {

@@ -63,6 +63,7 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
   const [name, setName] = useState('')
   const [msg, setMsg] = useState('')
   const [progress, setProgress] = useState<number>(0)
+  const [phase, setPhase] = useState<'upload' | 'processing' | 'done'>('upload')
   const [loading, setLoading] = useState(false)
 
   // ── ZIP-Validierung ──────────────────────────────────────────────────────
@@ -89,6 +90,7 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
 
     setLoading(true)
     setProgress(0)
+    setPhase('upload')
     setMsg('')
 
     const error = await validateZip(zip)
@@ -100,7 +102,10 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
     }
 
     try {
-      const uploaded = await uploadZipToR2(zip, (pct) => setProgress(pct))
+      const uploaded = await uploadZipToR2(zip, (pct) => setProgress(Math.round(pct * 0.9)))
+
+      setProgress(90)
+      setPhase('processing')
 
       const res = await fetch('/api/import/gltf/complete', {
         method: 'POST',
@@ -124,8 +129,9 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
 
       const importedScene = data as Scene
 
-      setMsg('Erfolgreich gespeichert')
       setProgress(100)
+      setPhase('done')
+      setMsg('Fertig!')
 
       if (importedScene?.scene_uuid) {
         onImport?.(importedScene)
@@ -210,8 +216,14 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
         <div className="mt-5">
           <div className="mb-2 flex items-center justify-between text-xs text-slate-500">
             <div className="flex items-center gap-1.5">
-              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-indigo-500" />
-              <span>Wird hochgeladen…</span>
+              {phase !== 'done' && (
+                <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-indigo-500" />
+              )}
+              <span>
+                {phase === 'upload' && 'Hochladen'}
+                {phase === 'processing' && 'Verarbeiten'}
+                {phase === 'done' && 'Fertig!'}
+              </span>
             </div>
             <span>{progress}%</span>
           </div>
