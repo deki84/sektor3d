@@ -13,15 +13,23 @@ export async function POST(request: Request) {
   try {
     const { title, cover } = await request.json()
     const payload = await getPayload({ config: configPromise })
+    const { user } = await payload.auth({ headers: request.headers })
 
-    const slug = title
+    const slug = `${title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '')
+      .replace(/(^-|-$)/g, '')}-${Date.now()}`
 
     const doc = await payload.create({
       collection: 'scenes',
-      data: { title, cover: cover ?? '', slug, viewerType: 'gltf', scene_uuid: slug },
+      data: {
+        title,
+        cover: cover ?? '',
+        slug,
+        viewerType: 'gltf',
+        scene_uuid: slug,
+        createdBy: user?.id,
+      } as any,
     })
 
     return NextResponse.json(doc, { status: 201 })

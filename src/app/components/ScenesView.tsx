@@ -125,14 +125,21 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
 
       {/* ── Szenen-Grid ─────────────────────────────────────────────── */}
       <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-        {scenes.map((s, index) => (
-          <SceneCard
-            key={s.scene_uuid ?? `${s.title}-${index}`}
-            scene={s}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        ))}
+        {(() => {
+          const titleCount = scenes.reduce<Record<string, number>>((acc, s) => {
+            acc[s.title] = (acc[s.title] ?? 0) + 1
+            return acc
+          }, {})
+          return scenes.map((s, index) => (
+            <SceneCard
+              key={s.scene_uuid ?? `${s.title}-${index}`}
+              scene={s}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              isDuplicate={titleCount[s.title] > 1}
+            />
+          ))
+        })()}
       </div>
 
       {/* ── Import-Modal ────────────────────────────────────────────── */}

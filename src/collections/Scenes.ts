@@ -3,7 +3,31 @@ import type { CollectionConfig } from 'payload'
 export const Scenes: CollectionConfig = {
   slug: 'scenes',
   admin: { useAsTitle: 'title' },
-  access: { read: () => true, create: () => true, update: () => true, delete: () => true },
+  access: {
+    read: ({ req: { user } }) => {
+      if (!user) return false
+      return { createdBy: { equals: user.id } }
+    },
+    create: () => true,
+    update: ({ req: { user } }) => {
+      if (!user) return false
+      return { createdBy: { equals: user.id } }
+    },
+    delete: ({ req: { user } }) => {
+      if (!user) return false
+      return { createdBy: { equals: user.id } }
+    },
+  },
+  hooks: {
+    beforeChange: [
+      ({ operation, req, data }) => {
+        if (operation === 'create' && req.user) {
+          data.createdBy = req.user.id
+        }
+        return data
+      },
+    ],
+  },
   fields: [
     { name: 'title', type: 'text', required: true },
     { name: 'slug', type: 'text', required: true, unique: true },
@@ -47,6 +71,10 @@ export const Scenes: CollectionConfig = {
       type: 'text',
     },
     {
+      name: 'fileHash',
+      type: 'text',
+    },
+    {
       name: 'originalName',
       type: 'text',
     },
@@ -64,6 +92,13 @@ export const Scenes: CollectionConfig = {
         { label: 'Failed', value: 'failed' },
       ],
       defaultValue: 'uploaded',
+    },
+    {
+      name: 'createdBy',
+      type: 'relationship',
+      relationTo: 'users',
+      required: false,
+      admin: { readOnly: true },
     },
   ],
 }

@@ -55,7 +55,7 @@ function findCoverEntry(entries: AdmZip.IZipEntry[]): AdmZip.IZipEntry | null {
     if (!IMAGE_EXTS.has(ext)) continue
 
     const stem = path.basename(rel, ext).toLowerCase()
-    if (THUMBNAIL_STEMS.has(stem)) return e          // sofort zurück bei Treffer
+    if (THUMBNAIL_STEMS.has(stem)) return e // sofort zurück bei Treffer
 
     if (!firstRootImage && !rel.includes('/')) firstRootImage = e
   }
@@ -74,16 +74,23 @@ export async function POST(req: Request) {
     }
 
     const payload = await getPayload({ config: configPromise })
+    const { user } = await payload.auth({ headers: req.headers }) // ← neu
     const sceneUuid = crypto.randomUUID()
-    const slug = name
+    const slug = `${name
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '')
+      .replace(/(^-|-$)/g, '')}-${Date.now()}`
 
-    // Szene anlegen
     const scene = await payload.create({
       collection: 'scenes',
-      data: { title: name, slug, scene_uuid: sceneUuid, viewerType: 'gltf', cover: '' },
+      data: {
+        title: name,
+        slug,
+        scene_uuid: sceneUuid,
+        viewerType: 'gltf',
+        cover: '',
+        ...(user?.id ? { createdBy: user.id } : {}), // ← neu
+      },
     })
 
     // ZIP extrahieren und Dateien in S3 hochladen
@@ -136,7 +143,12 @@ export async function POST(req: Request) {
     })
 
     return NextResponse.json(
-      { scene_uuid: updated.scene_uuid, title: updated.title, cover: updated.cover, slug: updated.slug },
+      {
+        scene_uuid: updated.scene_uuid,
+        title: updated.title,
+        cover: updated.cover,
+        slug: updated.slug,
+      },
       { status: 200 },
     )
   } catch (e: any) {

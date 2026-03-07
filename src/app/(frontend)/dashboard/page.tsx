@@ -24,9 +24,13 @@ async function getData() {
 
   if (!user) redirect('/login')
 
-  const base = process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3000'
-  const res = await fetch(`${base}/api/scenes`, { next: { tags: ['scenes'] } })
-  const scenes: Scene[] = res.ok ? await res.json() : []
+  const result = await payload.find({
+    collection: 'scenes',
+    where: { createdBy: { equals: user.id } },
+    overrideAccess: true,
+    req: { headers: requestHeaders } as any,
+  })
+  const scenes: Scene[] = result.docs as unknown as Scene[]
 
   return { user, scenes }
 }
@@ -81,6 +85,7 @@ export default async function DashboardPage() {
               <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-400">
                 Letzte Szenen
               </h2>
+
               <Link
                 href="/uploadPage3d"
                 className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-500 transition-colors"
@@ -101,7 +106,7 @@ export default async function DashboardPage() {
                     className="group relative rounded-xl overflow-hidden border border-gray-100 bg-slate-50"
                   >
                     {/* Thumbnail */}
-                    <SceneCard scene={scene} />
+                    <SceneCard showActions={false} scene={scene} />
 
                     {/* Hover overlay */}
                     <div className="absolute inset-0 bg-slate-900/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -121,15 +126,6 @@ export default async function DashboardPage() {
               </div>
             )}
           </section>
-
-          {/* CTA */}
-          <Link
-            href="/uploadPage3d?import=1"
-            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            Szene importieren
-          </Link>
         </div>
       </main>
     </div>

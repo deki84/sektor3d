@@ -16,12 +16,14 @@ type Scene = {
   gltfFileUrl?: string
 }
 
-async function getScenes(): Promise<Scene[]> {
-  const base = process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3000'
-  const res = await fetch(`${base}/api/scenes`, { next: { tags: ['scenes'] } })
-  if (!res.ok) throw new Error('Failed to fetch scenes')
-  const data = await res.json()
-  return Array.isArray(data) ? data : []
+async function getScenes(userId: string): Promise<Scene[]> {
+  const payload = await getPayload({ config: await config })
+  const result = await payload.find({
+    collection: 'scenes',
+    where: { createdBy: { equals: userId } },
+    overrideAccess: true,
+  })
+  return result.docs as unknown as Scene[]
 }
 
 export default async function uploadPage3d() {
@@ -31,7 +33,7 @@ export default async function uploadPage3d() {
   const { user } = await payload.auth({ headers })
   if (!user) redirect('/login')
 
-  const scenes = await getScenes()
+  const scenes = await getScenes(String(user!.id))
 
   return (
     <div className="flex h-screen bg-[#f0f4fa] overflow-hidden">

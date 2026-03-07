@@ -2,10 +2,16 @@ export const runtime = 'nodejs'
 
 import AdmZip from 'adm-zip'
 import path from 'path'
+import crypto from 'crypto'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { NextResponse } from 'next/server'
-import { S3Client, GetObjectCommand, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
+import {
+  S3Client,
+  GetObjectCommand,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3'
 
 const s3 = new S3Client({
   region: process.env.S3_REGION ?? 'auto',
@@ -62,13 +68,31 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing key or sceneName' }, { status: 400 })
     }
 
-    const slug = sceneName
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '')
     const sceneUuid = crypto.randomUUID()
+    const slug = `${sceneName.toLowerCase().replace(/\s+/g, '-')}-${sceneUuid.slice(0, 8)}`
 
     const payload = await getPayload({ config })
+    const { user } = await payload.auth({ headers: req.headers })
+
+    if (user) {
+      const existing = await payload.find({
+        collection: 'scenes',
+        where: {
+          and: [
+            { title: { equals: sceneName } },
+            { createdBy: { equals: user.id } },
+          ],
+        },
+        overrideAccess: true,
+        limit: 1,
+      })
+      if (existing.totalDocs > 0) {
+        return NextResponse.json(
+          { error: 'Du hast bereits eine Szene mit diesem Namen.' },
+          { status: 409 },
+        )
+      }
+    }
 
     const scene = await payload.create({
       collection: 'scenes',
@@ -80,6 +104,7 @@ export async function POST(req: Request) {
         originalName,
         size,
         status: 'processing',
+        ...(user?.id ? { createdBy: user.id } : {}),
       } as any,
     })
 
@@ -97,6 +122,29 @@ export async function POST(req: Request) {
       chunks.push(chunk)
     }
     const buf = Buffer.concat(chunks)
+    const fileHash = crypto.createHash('sha256').update(buf).digest('hex')
+
+    if (user) {
+      const hashDuplicate = await payload.find({
+        collection: 'scenes',
+        where: {
+          and: [
+            { fileHash: { equals: fileHash } },
+            { createdBy: { equals: user.id } },
+          ],
+        },
+        overrideAccess: true,
+        limit: 1,
+      })
+      if (hashDuplicate.totalDocs > 0) {
+        await s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET!, Key: key }))
+        await payload.delete({ collection: 'scenes', id: scene.id })
+        return NextResponse.json(
+          { error: `Diese Datei wurde bereits als "${hashDuplicate.docs[0].title}" importiert.` },
+          { status: 409 },
+        )
+      }
+    }
 
     // Extract ZIP
     const zip = new AdmZip(buf)
@@ -141,7 +189,7 @@ export async function POST(req: Request) {
     const updated = await payload.update({
       collection: 'scenes',
       id: scene.id,
-      data: { gltfFileUrl, cover, r2Key: key, status: 'ready' } as any,
+      data: { gltfFileUrl, cover, r2Key: key, status: 'ready', fileHash } as any,
     })
 
     // Remove the original ZIP from R2
