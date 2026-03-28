@@ -39,7 +39,7 @@ export default function Sidebar({ activePage }: SidebarProps) {
           }`}
         >
           <Layers className="h-4 w-4 shrink-0" />
-          <span>Szenen</span>
+          <span>Scenes</span>
         </Link>
       </nav>
 

@@ -7,11 +7,11 @@ interface Props {
   modelUrl: string
 }
 const COLORS = [
-  { label: 'Schwarz', hex: '#1a1a1a' },
-  { label: 'Weiß', hex: '#f5f5f5' },
-  { label: 'Silber', hex: '#c0c0c0' },
-  { label: 'Rot', hex: '#c0392b' },
-  { label: 'Blau', hex: '#1a3a6b' },
+  { label: 'Blac,', hex: '#1a1a1a' },
+  { label: 'White', hex: '#f5f5f5' },
+  { label: 'Silver', hex: '#c0c0c0' },
+  { label: 'Red', hex: '#FF0000' },
+  { label: 'Blue', hex: '#1a3a6b' },
   { label: 'Gold', hex: '#c8a415' },
 ]
 
@@ -108,7 +108,7 @@ export default function ModelViewerComponent({ modelUrl }: Props) {
         onClick={() => window.history.back()}
         className="absolute top-4 left-4 z-20 flex items-center gap-2 px-4 py-2 rounded-xl bg-white/80 backdrop-blur shadow border border-neutral-200 text-sm font-medium text-neutral-700 hover:bg-white transition"
       >
-        ← Zurück
+        ← Back
       </button>
 
       {/* @ts-expect-error model-viewer is a custom web component */}

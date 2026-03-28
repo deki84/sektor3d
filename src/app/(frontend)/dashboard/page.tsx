@@ -2,7 +2,7 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { headers as getHeaders } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { Plus, ArrowRight, Layers } from 'lucide-react'
+import { ArrowRight, Layers } from 'lucide-react'
 import Link from 'next/link'
 import Sidebar from '@/app/components/Sidebar'
 import SceneCard from '@/app/components/SceneCard'
@@ -68,13 +68,13 @@ export default async function DashboardPage() {
           {/* Stats */}
           <section className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
             <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-4">
-              Übersicht
+              Overview
             </h2>
             <div className="flex items-center gap-2">
               <Layers className="h-4 w-4 text-indigo-500" />
               <span className="text-slate-700 text-sm">
-                <span className="font-semibold text-slate-900 text-lg">{scenes.length}</span> Szene
-                {scenes.length !== 1 ? 'n' : ''} gespeichert
+                <span className="font-semibold text-slate-900 text-lg">{scenes.length}</span> Scene
+                {scenes.length !== 1 ? 'n' : ''} saved
               </span>
             </div>
           </section>
@@ -83,21 +83,19 @@ export default async function DashboardPage() {
           <section className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-400">
-                Letzte Szenen
+                Last Scenes
               </h2>
 
               <Link
                 href="/uploadPage3d"
                 className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-500 transition-colors"
               >
-                Alle anzeigen <ArrowRight className="h-3 w-3" />
+                Show all <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
 
             {recent.length === 0 ? (
-              <p className="text-sm text-slate-400 py-4 text-center">
-                Noch keine Szenen vorhanden.
-              </p>
+              <p className="text-sm text-slate-400 py-4 text-center">No scenes found.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {recent.map((scene, i) => (
@@ -118,7 +116,7 @@ export default async function DashboardPage() {
                         }
                         className="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-slate-900 hover:bg-indigo-50 transition"
                       >
-                        Öffnen
+                        Open
                       </Link>
                     </div>
                   </div>

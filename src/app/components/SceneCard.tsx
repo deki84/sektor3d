@@ -27,7 +27,13 @@ type SceneCardProps = {
 }
 
 // ─── SceneCard ────────────────────────────────────────────────────────────────
-export default function SceneCard({ scene, onEdit, onDelete, showActions = true, isDuplicate = false }: SceneCardProps) {
+export default function SceneCard({
+  scene,
+  onEdit,
+  onDelete,
+  showActions = true,
+  isDuplicate = false,
+}: SceneCardProps) {
   return (
     <article className="group relative rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden transition hover:-translate-y-0.5 hover:shadow-md">
       {/* ── Vorschau ─────────────────────────────────────────────────── */}
@@ -97,7 +103,7 @@ export default function SceneCard({ scene, onEdit, onDelete, showActions = true,
       <div className="px-4 py-3 border-t border-gray-100">
         <h3 className="font-medium text-slate-900 truncate">{scene.title}</h3>
         <p className={`text-xs mt-0.5 ${isDuplicate ? 'text-red-500' : 'text-slate-400'}`}>
-          {isDuplicate ? 'Duplikat' : '3D Szene'}
+          {isDuplicate ? 'Duplikat' : '3D Scene'}
         </p>
       </div>
     </article>

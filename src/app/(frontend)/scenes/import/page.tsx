@@ -70,7 +70,7 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
   // Prüft ob die Datei eine ZIP ist und eine .gltf-Datei enthält
   async function validateZip(file: File) {
     if (!file.name.toLowerCase().endsWith('.zip')) {
-      return 'Bitte nur ZIP-Dateien hochladen'
+      return 'Please upload ZIP files only'
     }
 
     const buf = await file.arrayBuffer()
@@ -78,13 +78,13 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
     const entries = Object.keys(zipContent.files).map((f) => f.toLowerCase())
 
     if (!entries.some((f) => f.endsWith('.gltf') || f.endsWith('.glb'))) {
-      return 'Fehler: Keine .gltf- oder .glb-Datei in der ZIP gefunden'
+      return 'Error: No .gltf or .glb file found in the ZIP'
     }
     return null
   }
 
   // ── Upload-Handler ──────────────────────────────────────────────────────
-   async function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault()
     if (!zip || !name) return
 
@@ -121,7 +121,7 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
       const data = await res.json().catch(() => ({}))
 
       if (!res.ok) {
-        setMsg(data?.message || data?.error || 'Import fehlgeschlagen')
+        setMsg(data?.message || data?.error || 'Import failed')
         setLoading(false)
         setTimeout(() => setMsg(''), 3000)
         return
@@ -131,7 +131,7 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
 
       setProgress(100)
       setPhase('done')
-      setMsg('Fertig!')
+      setMsg('Done!')
 
       if (importedScene?.scene_uuid) {
         onImport?.(importedScene)
@@ -143,20 +143,20 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
       }, 1500)
     } catch (err: any) {
       console.error(err)
-      setMsg(err?.message || 'Netzwerkfehler beim Upload')
+      setMsg(err?.message || 'Network error during upload')
       setTimeout(() => setMsg(''), 3000)
     } finally {
       setLoading(false)
     }
   }
-    const isSuccess = msg && !msg.toLowerCase().startsWith('fehler')
+  const isSuccess = msg && !msg.toLowerCase().startsWith('error')
   return (
     <div className="relative rounded-2xl bg-white border border-gray-200 shadow-2xl p-8">
       <button
         type="button"
         onClick={onClose}
         className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-slate-500 transition hover:bg-gray-100 hover:text-slate-900"
-        aria-label="Schließen"
+        aria-label="Close"
       >
         <X className="h-4 w-4" />
       </button>
@@ -164,30 +164,30 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
       <div className="mb-6">
         <h2 className="text-xl font-bold text-slate-900">GLTF Import</h2>
         <p className="mt-1 text-sm text-slate-500">
-          ZIP-Datei mit GLTF/GLB, BIN und Texturen hochladen
+          Upload ZIP file containing GLTF/GLB, BIN and textures
         </p>
       </div>
 
       <form onSubmit={submit} className="space-y-5">
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-slate-700">Szenenname</label>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">Scene Name</label>
           <input
             className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-slate-900 placeholder:text-slate-500 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="z. B. Wohnzimmer, Auto, Gebäude"
+            placeholder="e.g. Sports Car, Race Car, SUV"
             required
           />
         </div>
 
         {/* ── Datei-Upload ────────────────────────────────────────── */}
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-slate-700">ZIP-Datei</label>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">ZIP file</label>
           <label className="group flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-8 cursor-pointer transition hover:border-indigo-500 hover:bg-gray-100">
             <FileArchive className="h-8 w-8 text-slate-500 group-hover:text-indigo-400 transition" />
             <div className="text-center">
               <span className="text-sm font-medium text-slate-700">
-                {zip ? zip.name : 'Datei auswählen'}
+                {zip ? zip.name : 'Choose file'}
               </span>
               <p className="mt-0.5 text-xs text-slate-500">
                 {zip ? `${(zip.size / 1024 / 1024).toFixed(1)} MB` : '.zip · max. 100 MB'}
@@ -208,7 +208,7 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
           disabled={!zip || !name || loading}
         >
           {loading ? <Loader2 className="animate-spin h-5 w-5" /> : <Upload className="h-5 w-5" />}
-          {loading ? 'Importiere…' : 'Import starten'}
+          {loading ? 'Import…' : 'Start Import'}
         </button>
       </form>
 
@@ -220,9 +220,9 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
                 <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-indigo-500" />
               )}
               <span>
-                {phase === 'upload' && 'Hochladen'}
-                {phase === 'processing' && 'Verarbeiten'}
-                {phase === 'done' && 'Fertig!'}
+                {phase === 'upload' && 'Uploading'}
+                {phase === 'processing' && 'Processing'}
+                {phase === 'done' && 'Done!'}
               </span>
             </div>
             <span>{progress}%</span>
@@ -235,7 +235,6 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
           </div>
         </div>
       )}
-      
 
       {msg && (
         <div

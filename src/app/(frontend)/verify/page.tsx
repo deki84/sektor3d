@@ -19,11 +19,10 @@ export default async function VerifyPage({ searchParams }: Props) {
     cache: 'no-store',
     headers: { 'Content-Type': 'application/json' },
   })
-
-  // ✅ Wenn erfolgreich → DIREKT zur UploadPage
+  // ✅ Success → redirect directly to UploadPage
   if (res.ok) redirect(nextUrl)
 
-  // ✅ Fehlermeldung aus Payload lesen und zur Login-Seite mitgeben
+  // ✅ Read error message from Payload and pass it to the login page
   let details = `status-${res.status}`
   try {
     const data = await res.clone().json()

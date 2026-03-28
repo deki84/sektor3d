@@ -16,9 +16,9 @@ function PasswordStrengthMeter({ password, show }: { password: string; show: boo
   if (!show || !password) return null
   const strength: PasswordStrength = getPasswordStrength(password)
   const config = {
-    weak: { label: 'Schwach', color: 'bg-red-400', width: 'w-1/3' },
-    medium: { label: 'Mittel', color: 'bg-yellow-400', width: 'w-2/3' },
-    strong: { label: 'Stark', color: 'bg-green-500', width: 'w-full' },
+    weak: { label: 'Weak', color: 'bg-red-400', width: 'w-1/3' },
+    medium: { label: 'Medium', color: 'bg-yellow-400', width: 'w-2/3' },
+    strong: { label: 'Strong', color: 'bg-green-500', width: 'w-full' },
   }[strength]
 
   return (
@@ -33,7 +33,7 @@ function PasswordStrengthMeter({ password, show }: { password: string; show: boo
   )
 }
 
-// ─── Reset-Formular (braucht Suspense wegen useSearchParams) ──────────────────
+// ─── Reset Form (requires Suspense because of useSearchParams) ────────────────
 function ResetForm() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -75,7 +75,7 @@ function ResetForm() {
     if (res.ok) {
       router.push('/login?reset=success')
     } else {
-      setServerError('Token ungültig oder abgelaufen.')
+      setServerError('Token invalid or expired.')
     }
     setLoading(false)
   }
@@ -83,15 +83,15 @@ function ResetForm() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f0f4fa]">
       <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200 max-w-md w-full">
-        <h2 className="text-xl font-bold text-slate-900 mb-1">Neues Passwort setzen</h2>
+        <h2 className="text-xl font-bold text-slate-900 mb-1">Set new password</h2>
         <p className="text-slate-500 text-sm mb-6">
-          Mind. 8 Zeichen, Groß-/Kleinbuchstabe, Ziffer und Sonderzeichen.
+          Min. 8 characters, uppercase/lowercase letter, number and special character.
         </p>
 
         <form onSubmit={onSubmit} noValidate className="space-y-4">
-          {/* Neues Passwort */}
+          {/* New password */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Neues Passwort</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">New password</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
               <input
@@ -99,25 +99,27 @@ function ResetForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              {/* Passwort ein-/ausblenden */}
+              {/* Show/hide password */}
               <button
                 type="button"
                 className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600 transition"
                 onClick={() => setShowPw((v) => !v)}
-                aria-label={showPw ? 'Passwort verbergen' : 'Passwort anzeigen'}
+                aria-label={showPw ? 'Hide password' : 'Show password'}
                 aria-pressed={showPw}
               >
                 {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            {/* Stärkeanzeige */}
+            {/* Strength indicator */}
             <PasswordStrengthMeter password={password} show={submitted} />
             {showPasswordErr && <p className="mt-0.5 text-xs text-red-500">{showPasswordErr}</p>}
           </div>
 
-          {/* Passwort wiederholen */}
+          {/* Confirm password */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Wiederholen</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Confirm password
+            </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
               <input
@@ -125,12 +127,12 @@ function ResetForm() {
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
               />
-              {/* Bestätigungs-Passwort ein-/ausblenden */}
+              {/* Show/hide confirm password */}
               <button
                 type="button"
                 className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600 transition"
                 onClick={() => setShowConfirm((v) => !v)}
-                aria-label={showConfirm ? 'Passwort verbergen' : 'Passwort anzeigen'}
+                aria-label={showConfirm ? 'Hide password' : 'Show password'}
                 aria-pressed={showConfirm}
               >
                 {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -147,7 +149,7 @@ function ResetForm() {
             className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl py-2.5 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {loading ? 'Wird gespeichert...' : 'Passwort speichern'}
+            {loading ? 'Saving...' : 'Save password'}
           </button>
         </form>
       </div>
@@ -155,7 +157,7 @@ function ResetForm() {
   )
 }
 
-// Suspense nötig wegen useSearchParams in Next.js
+// Suspense required because of useSearchParams in Next.js
 export default function ResetPasswordPage() {
   return (
     <Suspense>

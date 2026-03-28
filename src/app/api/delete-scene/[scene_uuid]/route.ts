@@ -26,7 +26,7 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ scene_uuid:
   })
 
   if (!docs.length) {
-    return NextResponse.json({ ok: true, message: 'Szene existierte nicht.' }, { status: 200 })
+    return NextResponse.json({ ok: true, message: 'Scene not exists.' }, { status: 200 })
   }
 
   const scene = docs[0]

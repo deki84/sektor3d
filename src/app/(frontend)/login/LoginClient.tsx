@@ -75,9 +75,9 @@ export default function LoginClient() {
         return
       }
 
-      setServerError(typeof data === 'string' ? data : data?.message || 'Anmeldung fehlgeschlagen.')
+      setServerError(typeof data === 'string' ? data : data?.message || 'Login failed.')
     } catch {
-      setServerError('Netzwerkfehler. Bitte später erneut versuchen.')
+      setServerError('Network error. Please try again later.')
     } finally {
       setLoading(false)
     }
@@ -90,14 +90,14 @@ export default function LoginClient() {
           <div className="mx-auto mb-4 flex items-center justify-center">
             <img src="./logo.png" alt="Sektor3D Logo" className="h-14 w-auto drop-shadow-lg" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Willkommen zurück</h1>
-          <p className="mt-1 text-sm text-slate-500">Melden Sie sich beim Sektor an</p>
+          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Welcome back</h1>
+          <p className="mt-1 text-sm text-slate-500">Sign in to Sektor</p>
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-sm ring-1 ring-white/10">
           <form className="space-y-5" onSubmit={onSubmit} noValidate aria-busy={loading}>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-700">E-Mail</label>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
                 <input
@@ -114,7 +114,7 @@ export default function LoginClient() {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-700">Passwort</label>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
                 <input
@@ -129,7 +129,7 @@ export default function LoginClient() {
                   type="button"
                   className="absolute inset-y-0 right-3 flex items-center text-slate-500 hover:text-slate-300 transition"
                   onClick={() => setShowPw((v) => !v)}
-                  aria-label={showPw ? 'Passwort verbergen' : 'Passwort anzeigen'}
+                  aria-label={showPw ? 'Hide password' : 'Show password'}
                   aria-pressed={showPw}
                 >
                   {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -150,7 +150,7 @@ export default function LoginClient() {
               className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 font-semibold text-white shadow-lg shadow-indigo-900/30 transition hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading && <Spinner />}
-              <span>{loading ? 'Wird angemeldet…' : 'Anmelden'}</span>
+              <span>{loading ? 'Signing in…' : 'Sign in'}</span>
             </button>
 
             <div className="text-center mt-2">
@@ -158,18 +158,18 @@ export default function LoginClient() {
                 href="/forgot-password"
                 className="text-sm text-slate-500 hover:text-indigo-600 transition-colors"
               >
-                Passwort vergessen?
+                Forgot password?
               </Link>
             </div>
           </form>
 
           <div className="mt-6 text-center text-sm text-slate-400">
-            Kein Konto?{' '}
+            No account?{' '}
             <a
               className="font-medium text-indigo-400 hover:text-indigo-300 underline-offset-4 hover:underline transition"
               href={`/register?email=${encodeURIComponent(sanitizeEmail(email) || '')}&next=${encodeURIComponent(nextUrl)}`}
             >
-              Jetzt registrieren
+              Register now
             </a>
           </div>
         </div>

@@ -23,26 +23,24 @@ export default async function VerifyRequestedPage({ searchParams }: Props) {
           </div>
 
           <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
-            Fast fertig <span aria-hidden>✅</span>
+            Almost done <span aria-hidden>✅</span>
           </h1>
 
-          <p className="mt-1 text-sm text-slate-500">Bitte bestätige deine E-Mail-Adresse</p>
+          <p className="mt-1 text-sm text-slate-500">Please confirm your email address</p>
         </div>
 
         {/* Card */}
         <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm space-y-5">
           <p className="text-slate-700">
-            Wir haben dir eine E-Mail{' '}
-            {email && <span className="font-semibold text-slate-900">an {email}</span>} geschickt.
+            We sent you an email{' '}
+            {email && <span className="font-semibold text-slate-900">to {email}</span>}.
           </p>
 
-          <p className="text-slate-700">
-            Klicke auf den Link in der E-Mail, um dein Konto zu bestätigen.
-          </p>
+          <p className="text-slate-700">Click the link in the email to confirm your account.</p>
 
-          {/* Hinweis Box */}
+          {/* Hint Box */}
           <div className="rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-700">
-            Tipp: Schau auch in Spam oder Junk nach.
+            Tip: Also check your spam or junk folder.
           </div>
 
           {/* Button */}
@@ -50,13 +48,13 @@ export default async function VerifyRequestedPage({ searchParams }: Props) {
             href={`/login?email=${encodeURIComponent(email)}&next=${encodeURIComponent(nextUrl)}`}
             className="inline-flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 font-semibold text-white shadow-sm transition hover:bg-indigo-500"
           >
-            Zur Login-Seite
+            Go to login
           </Link>
         </div>
 
-        {/* Optional kleiner Footer */}
+        {/* Optional small footer */}
         <p className="mt-6 text-center text-xs text-slate-400">
-          Wenn keine Mail ankommt, überprüfe deine Adresse oder registriere dich erneut.
+          If no email arrives, check your address or register again.
         </p>
       </div>
     </div>

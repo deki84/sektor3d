@@ -62,7 +62,7 @@ export default function ForgotPasswordPage() {
             Falls ein Konto mit dieser E-Mail existiert, erhältst du einen Reset-Link.
           </p>
           <Link href="/login" className="text-indigo-600 text-sm hover:underline">
-            Zurück zum Login
+            Back to Login
           </Link>
         </div>
       </div>

@@ -107,11 +107,11 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
       {/* ── Seitenkopf ──────────────────────────────────────────────── */}
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Meine Szenen</h1>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">My Scenes</h1>
           <p className="mt-1 text-sm text-slate-500">
             {scenes.length === 0
-              ? 'Noch keine Szenen vorhanden – importiere deine erste.'
-              : `${scenes.length} Szene${scenes.length !== 1 ? 'n' : ''} vorhanden`}
+              ? 'No scenes yet – import your first one.'
+              : `${scenes.length} Scene${scenes.length !== 1 ? 'n' : ''} available`}
           </p>
         </div>
         <button
@@ -119,7 +119,7 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
           className="hidden sm:flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 shrink-0"
         >
           <Plus className="h-4 w-4" />
-          Importieren
+          Import
         </button>
       </div>
 
