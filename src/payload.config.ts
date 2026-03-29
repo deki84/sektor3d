@@ -21,8 +21,9 @@ export default buildConfig({
     user: Users.slug,
     theme: 'light',
     routes: {
-      reset: '/reset-password', // ← deine eigene Seite statt /admin/reset
+      reset: '/reset-password',
     },
+
     importMap: {
       baseDir: path.resolve(dirname),
     },

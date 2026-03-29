@@ -51,6 +51,14 @@ export const Users: CollectionConfig = {
     defaultColumns: ['name', 'email', 'roles'],
     group: 'System',
   },
+  access: {
+    read: ({ req: { user } }: { req: { user: any } }) => Boolean(user?.roles?.includes('admin')),
+    create: () => true,
+    update: ({ req: { user } }: { req: { user: any } }) => Boolean(user?.roles?.includes('admin')),
+    delete: (args: any) =>
+      Boolean(args?.req?.user?.roles?.includes('admin')) &&
+      String(args?.req?.user?.id) !== String(args?.id),
+  },
 
   fields: [
     {
