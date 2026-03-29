@@ -142,6 +142,38 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
         })()}
       </div>
 
+      {/* ── Empty State ─────────────────────────────────────────────── */}
+      {scenes.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="mb-6 rounded-2xl bg-indigo-50 p-6">
+            <svg
+              className="h-12 w-12 text-indigo-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"
+              />
+            </svg>
+          </div>
+          <h2 className="text-lg font-semibold text-slate-800">No scenes yet</h2>
+          <p className="mt-2 text-sm text-slate-500 max-w-xs">
+            Import your first 3D model to get started. Supports GLTF and GLB files.
+          </p>
+          <button
+            onClick={() => setOpenImport(true)}
+            className="mt-6 flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+          >
+            <Plus className="h-4 w-4" />
+            Import your first scene
+          </button>
+        </div>
+      )}
+
       {/* ── Import-Modal ────────────────────────────────────────────── */}
       {openImport && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 backdrop-blur-sm">

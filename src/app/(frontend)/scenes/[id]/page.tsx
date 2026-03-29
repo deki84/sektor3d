@@ -27,7 +27,6 @@ export default async function ScenePage({ params }: { params: Promise<{ scene_uu
     return <main className="container">Scene nicht gefunden.</main>
   }
 
-  // ✅ GLTF zuerst, GLB nur als Fallback (falls noch vorhanden)
   const url = (scene as any)?.gltfFileUrl || (scene as any)?.glbFile?.url || ''
 
   return (

@@ -11,28 +11,25 @@ function inputCls(extra = '') {
     transition ${extra}`
 }
 
-// Password validation logic
 function validatePasswordLocal(pw: string): string | null {
-  if (!pw) return 'Bitte Passwort eingeben'
-  if (pw.length < 8) return 'Mindestens 8 Zeichen eingeben'
+  if (!pw) return 'Please enter a password'
+  if (pw.length < 8) return 'At least 8 characters required'
 
-  // Check for uppercase, lowercase, number and special character
   const hasUpper = /[A-Z]/.test(pw)
   const hasLower = /[a-z]/.test(pw)
   const hasDigit = /\d/.test(pw)
   const hasSpecial = /[^A-Za-z0-9]/.test(pw)
 
   if (!hasUpper || !hasLower || !hasDigit || !hasSpecial) {
-    return 'Passwort: Groß-/Kleinbuchstabe, Zahl und Sonderzeichen nötig'
+    return 'Password must contain uppercase, lowercase, number and special character'
   }
 
   return null
 }
 
-// Confirm password validation
 function validatePasswordMatchLocal(pw: string, confirm: string): string | null {
-  if (!confirm) return 'Bitte Passwort wiederholen'
-  if (pw !== confirm) return 'Passwörter stimmen nicht überein'
+  if (!confirm) return 'Please confirm your password'
+  if (pw !== confirm) return 'Passwords do not match'
   return null
 }
 
@@ -49,11 +46,9 @@ export default function ResetPasswordPage() {
   const [serverError, setServerError] = useState('')
   const [submitted, setSubmitted] = useState(false)
 
-  // Recalculate validation errors on every render
   const passwordErr = validatePasswordLocal(password)
   const confirmErr = validatePasswordMatchLocal(password, confirm)
 
-  // Only show validation messages after the first submit attempt
   const showPasswordErr = submitted ? passwordErr : null
   const showConfirmErr = submitted ? confirmErr : null
 
@@ -61,12 +56,8 @@ export default function ResetPasswordPage() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
-
-    // Mark form as submitted to trigger validation messages
     setSubmitted(true)
-
     if (passwordErr || confirmErr) return
-
     setLoading(true)
     setServerError('')
 
@@ -77,7 +68,7 @@ export default function ResetPasswordPage() {
     })
 
     if (res.ok) router.push('/login')
-    else setServerError('Token ungültig oder abgelaufen.')
+    else setServerError('Token invalid or expired.')
 
     setLoading(false)
   }
@@ -90,26 +81,21 @@ export default function ResetPasswordPage() {
           alt="Sektor Logo"
           className="h-14 w-auto drop-shadow-lg mx-auto mb-4"
         />
-        <h1 className="text-2xl font-bold text-slate-900">Neues Passwort setzen</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Set new password</h1>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 px-8 py-8 w-full max-w-md">
         <form onSubmit={onSubmit} noValidate className="space-y-4">
-          {/* New password input */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Neues Passwort</label>
-
+            <label className="block text-sm font-medium text-slate-700 mb-1">New password</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-
               <input
                 type={showPw ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={inputCls('pl-10 pr-11')}
               />
-
-              {/* Toggle password visibility */}
               <button
                 type="button"
                 className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600 transition"
@@ -118,26 +104,21 @@ export default function ResetPasswordPage() {
                 {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-
-            {/* Validation message */}
             {showPasswordErr && <p className="mt-1 text-xs text-black">{showPasswordErr}</p>}
           </div>
 
-          {/* Confirm password input */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Wiederholen</label>
-
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Confirm password
+            </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-
               <input
                 type={showConfirm ? 'text' : 'password'}
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 className={inputCls('pl-10 pr-11')}
               />
-
-              {/* Toggle confirm password visibility */}
               <button
                 type="button"
                 className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600 transition"
@@ -146,12 +127,9 @@ export default function ResetPasswordPage() {
                 {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-
-            {/* Validation message */}
             {showConfirmErr && <p className="mt-1 text-xs text-black">{showConfirmErr}</p>}
           </div>
 
-          {/* Server error message */}
           {serverError && <p className="text-black text-xs">{serverError}</p>}
 
           <button
@@ -160,13 +138,13 @@ export default function ResetPasswordPage() {
             className="w-full bg-indigo-500 hover:bg-indigo-400 text-white font-semibold rounded-xl py-3 text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {loading ? 'Wird gespeichert...' : 'Passwort speichern'}
+            {loading ? 'Saving...' : 'Save password'}
           </button>
         </form>
 
         <div className="text-center mt-4">
           <Link href="/login" className="text-sm text-slate-400 hover:text-slate-600">
-            Zurück zum Login
+            Back to login
           </Link>
         </div>
       </div>

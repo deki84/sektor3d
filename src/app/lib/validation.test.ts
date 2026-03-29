@@ -13,23 +13,23 @@ import {
 // ─── validateEmail ────────────────────────────────────────────────────────────
 describe('validateEmail', () => {
   it('accepts a valid email address', () => {
-    expect(validateEmail('max@example.com')).toBeNull()
+    expect(validateEmail('john@example.com')).toBeNull()
   })
 
   it('accepts email with subdomain', () => {
-    expect(validateEmail('max@mail.example.com')).toBeNull()
+    expect(validateEmail('john@mail.example.com')).toBeNull()
   })
 
   it('rejects email without @ symbol', () => {
-    expect(validateEmail('maxexample.com')).not.toBeNull()
+    expect(validateEmail('johnexample.com')).not.toBeNull()
   })
 
   it('rejects email without domain extension', () => {
-    expect(validateEmail('max@example')).not.toBeNull()
+    expect(validateEmail('john@example')).not.toBeNull()
   })
 
   it('rejects email with spaces', () => {
-    expect(validateEmail('max @example.com')).not.toBeNull()
+    expect(validateEmail('john @example.com')).not.toBeNull()
   })
 
   it('rejects empty input', () => {
@@ -37,18 +37,18 @@ describe('validateEmail', () => {
   })
 
   it('trims whitespace before validating', () => {
-    expect(validateEmail('  max@example.com  ')).toBeNull()
+    expect(validateEmail('  john@example.com  ')).toBeNull()
   })
 
   it('lowercases input before validating', () => {
-    expect(validateEmail('MAX@EXAMPLE.COM')).toBeNull()
+    expect(validateEmail('JOHN@EXAMPLE.COM')).toBeNull()
   })
 })
 
 // ─── validatePassword ─────────────────────────────────────────────────────────
 describe('validatePassword', () => {
   it('accepts a valid password meeting all requirements', () => {
-    expect(validatePassword('Sicher1!')).toBeNull()
+    expect(validatePassword('Secure1!')).toBeNull()
   })
 
   it('rejects password shorter than 8 characters', () => {
@@ -61,23 +61,23 @@ describe('validatePassword', () => {
   })
 
   it('rejects password missing an uppercase letter', () => {
-    expect(validatePassword('sicher1!')).not.toBeNull()
+    expect(validatePassword('secure1!')).not.toBeNull()
   })
 
   it('rejects password missing a lowercase letter', () => {
-    expect(validatePassword('SICHER1!')).not.toBeNull()
+    expect(validatePassword('SECURE1!')).not.toBeNull()
   })
 
   it('rejects password missing a digit', () => {
-    expect(validatePassword('Sicherheit!')).not.toBeNull()
+    expect(validatePassword('SecurePass!')).not.toBeNull()
   })
 
   it('rejects password missing a special character (!@#$%^&*)', () => {
-    expect(validatePassword('Sicherheit1')).not.toBeNull()
+    expect(validatePassword('SecurePass1')).not.toBeNull()
   })
 
   it('rejects password containing spaces', () => {
-    expect(validatePassword('Sicher 1!')).not.toBeNull()
+    expect(validatePassword('Secure 1!')).not.toBeNull()
   })
 
   it('rejects empty password', () => {
@@ -88,41 +88,41 @@ describe('validatePassword', () => {
 // ─── validateLoginPassword ────────────────────────────────────────────────────
 describe('validateLoginPassword', () => {
   it('accepts a valid login password', () => {
-    expect(validateLoginPassword('irgendwas1')).toBeNull()
+    expect(validateLoginPassword('something1')).toBeNull()
   })
 
   it('rejects password shorter than 8 characters', () => {
-    expect(validateLoginPassword('kurz')).not.toBeNull()
+    expect(validateLoginPassword('short')).not.toBeNull()
   })
 
   it('rejects password with spaces', () => {
-    expect(validateLoginPassword('passwort mit leerzeichen')).not.toBeNull()
+    expect(validateLoginPassword('password with spaces')).not.toBeNull()
   })
 })
 
 // ─── validatePasswordMatch ────────────────────────────────────────────────────
 describe('validatePasswordMatch', () => {
   it('returns null when both passwords are identical', () => {
-    expect(validatePasswordMatch('Sicher1!', 'Sicher1!')).toBeNull()
+    expect(validatePasswordMatch('Secure1!', 'Secure1!')).toBeNull()
   })
 
   it('returns an error when passwords differ', () => {
-    expect(validatePasswordMatch('Sicher1!', 'Sicher2!')).not.toBeNull()
+    expect(validatePasswordMatch('Secure1!', 'Secure2!')).not.toBeNull()
   })
 
   it('treats passwords as case-sensitive', () => {
-    expect(validatePasswordMatch('Sicher1!', 'sicher1!')).not.toBeNull()
+    expect(validatePasswordMatch('Secure1!', 'secure1!')).not.toBeNull()
   })
 })
 
 // ─── validateName ─────────────────────────────────────────────────────────────
 describe('validateName', () => {
   it('accepts a valid full name', () => {
-    expect(validateName('Max Mustermann')).toBeNull()
+    expect(validateName('John Doe')).toBeNull()
   })
 
   it('accepts a name with a hyphen', () => {
-    expect(validateName('Anna-Maria')).toBeNull()
+    expect(validateName('Mary-Jane')).toBeNull()
   })
 
   it('accepts a name with German umlauts', () => {
@@ -138,15 +138,15 @@ describe('validateName', () => {
   })
 
   it('rejects a name containing digits', () => {
-    expect(validateName('Max123')).not.toBeNull()
+    expect(validateName('John123')).not.toBeNull()
   })
 
   it('rejects a name containing special characters', () => {
-    expect(validateName('Max<script>')).not.toBeNull()
+    expect(validateName('John<script>')).not.toBeNull()
   })
 
   it('trims whitespace before validating', () => {
-    expect(validateName('  Max  ')).toBeNull()
+    expect(validateName('  John  ')).toBeNull()
   })
 })
 
@@ -169,24 +169,24 @@ describe('getPasswordStrength', () => {
   })
 
   it('rates a long password with all character types as strong', () => {
-    expect(getPasswordStrength('Sicher123!@#')).toBe('strong')
+    expect(getPasswordStrength('Secure123!@#')).toBe('strong')
   })
 })
 
 // ─── sanitizeEmail ────────────────────────────────────────────────────────────
 describe('sanitizeEmail', () => {
   it('converts email to lowercase', () => {
-    expect(sanitizeEmail('MAX@EXAMPLE.COM')).toBe('max@example.com')
+    expect(sanitizeEmail('JOHN@EXAMPLE.COM')).toBe('john@example.com')
   })
 
   it('trims leading and trailing whitespace', () => {
-    expect(sanitizeEmail('  max@example.com  ')).toBe('max@example.com')
+    expect(sanitizeEmail('  john@example.com  ')).toBe('john@example.com')
   })
 })
 
 // ─── sanitizeName ─────────────────────────────────────────────────────────────
 describe('sanitizeName', () => {
   it('trims leading and trailing whitespace', () => {
-    expect(sanitizeName('  Max Mustermann  ')).toBe('Max Mustermann')
+    expect(sanitizeName('  John Doe  ')).toBe('John Doe')
   })
 })

@@ -81,7 +81,7 @@ export default function SceneCard({
 
       {/* ── Aktions-Buttons (erscheinen beim Hover) ───────────────── */}
       {showActions && !isDuplicate && (
-        <div className="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-2 right-2 flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           <button
             onClick={() => onEdit?.(scene)}
             className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition hover:bg-indigo-600 hover:text-white"

@@ -120,22 +120,25 @@ export default function ModelViewerComponent({ modelUrl }: Props) {
       />
 
       {!isLoading && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/80 backdrop-blur shadow-lg border border-neutral-200">
-          <span className="text-xs font-medium text-neutral-500 mr-1">Farbe</span>
-          {COLORS.map((c) => (
-            <button
-              key={c.hex}
-              title={c.label}
-              onClick={() => applyColor(c.hex)}
-              className="w-7 h-7 rounded-full border-2 transition-transform hover:scale-110"
-              style={{
-                backgroundColor: c.hex,
-                borderColor: activeColor === c.hex ? '#000' : 'transparent',
-              }}
-            />
-          ))}
+        <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center px-4">
+          <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/90 backdrop-blur shadow-lg border border-neutral-200">
+            <span className="text-xs font-medium text-neutral-500 mr-1">Color</span>
+            {COLORS.map((c) => (
+              <button
+                key={c.hex}
+                title={c.label}
+                onClick={() => applyColor(c.hex)}
+                className="w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 active:scale-95"
+                style={{
+                  backgroundColor: c.hex,
+                  borderColor: activeColor === c.hex ? '#000' : 'transparent',
+                }}
+              />
+            ))}
+          </div>
         </div>
       )}
+
       {/* ── Loading overlay ───────────────────────────────────────────────── */}
       {isLoading && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-neutral-100">
