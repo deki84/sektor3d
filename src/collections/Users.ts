@@ -5,6 +5,7 @@ export const Users: CollectionConfig = {
   auth: {
     forgotPassword: {
       generateEmailSubject: () => 'Reset your password',
+      // args typed as any because Payload's internal type is not exported
       generateEmailHTML: (args: any) => {
         const token = args?.token ?? ''
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
@@ -25,7 +26,8 @@ export const Users: CollectionConfig = {
     },
     verify: {
       generateEmailSubject: () => 'Please confirm your email',
-      generateEmailHTML: ({ token }) => {
+      generateEmailHTML: (args: any) => {
+        const token = args?.token ?? ''
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
         const url = `${baseUrl}/verify?token=${token}`
         return `
