@@ -1,12 +1,13 @@
 import { redirect } from 'next/navigation'
 
 type Props = {
-  searchParams?: { token?: string; next?: string }
+  searchParams: Promise<{ token?: string; next?: string }>
 }
 
 export default async function VerifyPage({ searchParams }: Props) {
-  const token = searchParams?.token
-  const nextUrl = searchParams?.next || '/uploadPage3d'
+  const sp = await searchParams
+  const token = sp?.token
+  const nextUrl = sp?.next || '/uploadPage3d'
 
   if (!token) {
     redirect('/login?error=missing-token')

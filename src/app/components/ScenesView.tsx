@@ -109,14 +109,14 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">My Scenes</h1>
           <p className="mt-1 text-sm text-slate-500">
-            {scenes.length === 0
-              ? 'No scenes yet – import your first one.'
-              : `${scenes.length} Scene${scenes.length !== 1 ? 'n' : ''} available`}
+            {scenes.length > 0 &&
+              `${scenes.length} Scene${scenes.length !== 1 ? 's' : ''} available`}
           </p>
         </div>
         <button
           onClick={() => setOpenImport(true)}
-          className="hidden sm:flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 shrink-0"
+          className="// NEU
+className={`hidden sm:flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 shrink-0 ${scenes.length === 0 ? 'invisible' : ''}`}"
         >
           <Plus className="h-4 w-4" />
           Import
@@ -164,13 +164,6 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
           <p className="mt-2 text-sm text-slate-500 max-w-xs">
             Import your first 3D model to get started. Supports GLTF and GLB files.
           </p>
-          <button
-            onClick={() => setOpenImport(true)}
-            className="mt-6 flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
-          >
-            <Plus className="h-4 w-4" />
-            Import your first scene
-          </button>
         </div>
       )}
 
