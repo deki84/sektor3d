@@ -102,7 +102,7 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
   }
 
   return (
-    <section className="flex-1 p-6 md:p-10 bg-gray-50 min-h-screen">
+    <section className="flex-1 p-6 md:p-10 bg-gray-50 min-h-screen pt-20 md:pt-10">
       <LoadModelViewer />
       {/* ── Seitenkopf ──────────────────────────────────────────────── */}
       <div className="mb-8 flex items-start justify-between gap-4">
@@ -115,11 +115,10 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
         </div>
         <button
           onClick={() => setOpenImport(true)}
-          className="// NEU
-className={`hidden sm:flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 shrink-0 ${scenes.length === 0 ? 'invisible' : ''}`}"
+          className={`flex items-center gap-2 rounded-xl bg-indigo-600 px-3 py-2 sm:px-4 sm:py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 shrink-0 ${scenes.length === 0 ? 'invisible' : ''}`}
         >
           <Plus className="h-4 w-4" />
-          Import
+          <span>Import</span>
         </button>
       </div>
 

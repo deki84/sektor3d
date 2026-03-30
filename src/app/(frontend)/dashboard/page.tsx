@@ -40,10 +40,10 @@ export default async function DashboardPage() {
   const recent = scenes.slice(0, 3)
 
   return (
-    <div className="flex h-screen bg-[#f0f4fa] overflow-hidden">
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
       <Sidebar activePage="dashboard" />
 
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto pt-14 md:pt-0">
         <div className="max-w-4xl mx-auto px-8 py-10">
           {/* Heading */}
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-8">Dashboard</h1>

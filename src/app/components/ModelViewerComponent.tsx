@@ -120,7 +120,10 @@ export default function ModelViewerComponent({ modelUrl }: Props) {
       />
 
       {!isLoading && (
-        <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center px-4">
+        <div
+          className="absolute bottom-0 left-0 right-0 z-20 flex justify-center px-4 pb-6"
+          style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
+        >
           <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/90 backdrop-blur shadow-lg border border-neutral-200">
             <span className="text-xs font-medium text-neutral-500 mr-1">Color</span>
             {COLORS.map((c) => (
