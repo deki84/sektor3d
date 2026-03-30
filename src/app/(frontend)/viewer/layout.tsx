@@ -3,6 +3,11 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'sektor3d – Viewer',
   description: '3D Scene Viewer',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover',
+  },
 }
 
 // model-viewer is loaded on demand by ModelViewerComponent via a guarded
