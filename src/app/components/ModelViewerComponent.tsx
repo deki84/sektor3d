@@ -2,12 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-// ─── TypeScript declarations for the model-viewer web component ────
 interface Props {
   modelUrl: string
 }
+
 const COLORS = [
-  { label: 'Blac,', hex: '#1a1a1a' },
+  { label: 'Black', hex: '#1a1a1a' },
   { label: 'White', hex: '#f5f5f5' },
   { label: 'Silver', hex: '#c0c0c0' },
   { label: 'Red', hex: '#FF0000' },
@@ -31,8 +31,6 @@ export default function ModelViewerComponent({ modelUrl }: Props) {
     const b = parseInt(hex.slice(5, 7), 16) / 255
     ;(viewer.model.materials as any[]).forEach((mat) => {
       const name = (mat.name ?? '').toLowerCase()
-
-      // nur überspringen was definitiv kein Lack ist
       if (
         name.includes('window') ||
         name.includes('glass') ||
@@ -48,7 +46,6 @@ export default function ModelViewerComponent({ modelUrl }: Props) {
         name.includes('carbon')
       )
         return
-
       mat.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1])
     })
     setActiveColor(hex)
@@ -64,7 +61,6 @@ export default function ModelViewerComponent({ modelUrl }: Props) {
     const container = containerRef.current
     if (!container) return
 
-    // model-viewer is already in the DOM after React rendered it
     const viewer = container.querySelector('model-viewer') as HTMLElement | null
     if (!viewer) return
     viewerRef.current = viewer
@@ -103,7 +99,7 @@ export default function ModelViewerComponent({ modelUrl }: Props) {
 
   return (
     <div ref={containerRef} className="relative w-screen h-screen bg-neutral-100">
-      {/* back Button */}
+      {/* Back Button */}
       <button
         onClick={() => window.history.back()}
         className="absolute top-4 left-4 z-20 flex items-center gap-2 px-4 py-2 rounded-xl bg-white/80 backdrop-blur shadow border border-neutral-200 text-sm font-medium text-neutral-700 hover:bg-white transition"
@@ -119,11 +115,9 @@ export default function ModelViewerComponent({ modelUrl }: Props) {
         style={{ width: '100%', height: '100%' }}
       />
 
+      {/* Color Panel */}
       {!isLoading && (
-        <div
-          className="absolute bottom-0 left-0 right-0 z-20 flex justify-center px-4 pb-6"
-          style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
-        >
+        <div className="color-panel fixed bottom-0 left-0 right-0 z-20 flex justify-center px-4">
           <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/90 backdrop-blur shadow-lg border border-neutral-200">
             <span className="text-xs font-medium text-neutral-500 mr-1">Color</span>
             {COLORS.map((c) => (
@@ -142,12 +136,10 @@ export default function ModelViewerComponent({ modelUrl }: Props) {
         </div>
       )}
 
-      {/* ── Loading overlay ───────────────────────────────────────────────── */}
+      {/* Loading overlay */}
       {isLoading && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-neutral-100">
-          {/* Spinner */}
           <div className="w-10 h-10 rounded-full border-[3px] border-neutral-300 border-t-neutral-600 animate-spin" />
-          {/* Progress label */}
           <span className="text-sm font-medium text-neutral-500 tabular-nums tracking-wide">
             {progress > 0 ? `${progress} %` : 'Loading model…'}
           </span>

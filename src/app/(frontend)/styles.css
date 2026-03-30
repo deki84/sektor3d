@@ -8,3 +8,14 @@
 html, body, #__next { height: 100%; }
 body { margin: 0; }
 
+@media (orientation: portrait) {
+  .color-panel {
+    padding-bottom: max(6rem, env(safe-area-inset-bottom));
+  }
+}
+
+@media (orientation: landscape) {
+  .color-panel {
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+}
