@@ -93,10 +93,7 @@ export async function POST(req: Request) {
       const existing = await payload.find({
         collection: 'scenes',
         where: {
-          and: [
-            { title: { equals: sceneName } },
-            { createdBy: { equals: user.id } },
-          ],
+          and: [{ title: { equals: sceneName } }, { createdBy: { equals: user.id } }],
         },
         overrideAccess: true,
         limit: 1,
@@ -111,6 +108,7 @@ export async function POST(req: Request) {
 
     const scene = await payload.create({
       collection: 'scenes',
+      draft: true,
       data: {
         scene_uuid: sceneUuid,
         title: sceneName,
@@ -143,10 +141,7 @@ export async function POST(req: Request) {
       const hashDuplicate = await payload.find({
         collection: 'scenes',
         where: {
-          and: [
-            { fileHash: { equals: fileHash } },
-            { createdBy: { equals: user.id } },
-          ],
+          and: [{ fileHash: { equals: fileHash } }, { createdBy: { equals: user.id } }],
         },
         overrideAccess: true,
         limit: 1,
@@ -204,7 +199,13 @@ export async function POST(req: Request) {
     const updated = await payload.update({
       collection: 'scenes',
       id: scene.id,
-      data: { gltfFileUrl, cover, r2Key: key, status: 'ready', fileHash } satisfies SceneData as SceneData,
+      data: {
+        gltfFileUrl,
+        cover,
+        r2Key: key,
+        status: 'ready',
+        fileHash,
+      } satisfies SceneData as SceneData,
     })
 
     // Remove the original ZIP from R2
@@ -220,6 +221,9 @@ export async function POST(req: Request) {
     })
   } catch (error: unknown) {
     console.error('Error in /api/import/gltf/complete:', error)
-    return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal Server Error' }, { status: 500 })
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Internal Server Error' },
+      { status: 500 },
+    )
   }
 }

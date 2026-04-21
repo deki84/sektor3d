@@ -10,7 +10,7 @@ export const Users: CollectionConfig = {
   auth: {
     forgotPassword: {
       generateEmailSubject: () => 'Reset your password',
-      generateEmailHTML: (args: EmailArgs) => {
+      generateEmailHTML: (args?: EmailArgs) => {
         const token = args?.token ?? ''
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
         const url = `${baseUrl}/reset-password/${token}`
