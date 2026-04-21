@@ -4,7 +4,7 @@ import { useState } from 'react'
 import JSzip from 'jszip'
 import { Loader2, Upload, X, FileArchive } from 'lucide-react'
 
-// Typ der importierten Szene
+// Type of the imported scene
 type Scene = {
   scene_uuid?: string
   slug?: string
@@ -18,7 +18,7 @@ type ImportGLTFPageProps = {
 }
 
 async function uploadZipToR2(file: File, onProgress: (pct: number) => void) {
-  // 1) Presign holen (kleines JSON -> kein Limit)
+  // 1) Fetch presign URL (small JSON → no size limit)
   const presignRes = await fetch('/api/r2/presign', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -31,7 +31,7 @@ async function uploadZipToR2(file: File, onProgress: (pct: number) => void) {
   const { url, key } = await presignRes.json()
   if (!url || !key) throw new Error('Presign failed')
 
-  // 2) Direkt zu R2 hochladen (XHR -> Fortschritt)
+  // 2) Upload directly to R2 (XHR → progress)
   await new Promise<void>((resolve, reject) => {
     const xhr = new XMLHttpRequest()
     xhr.open('PUT', url, true)
@@ -55,9 +55,9 @@ async function uploadZipToR2(file: File, onProgress: (pct: number) => void) {
   return { key, size: file.size, originalName: file.name }
 }
 
-// ─── GLTF-Import Modal ────────────────────────────────────────────────────────
-// Ermöglicht das Hochladen einer ZIP-Datei, die eine .gltf-Datei enthält.
-// Zeigt Upload-Fortschritt an und ruft onImport mit der gespeicherten Szene auf.
+// ─── Vehicle Import Modal ─────────────────────────────────────────────────────
+// Allows uploading a ZIP file containing a .gltf file.
+// Shows upload progress and calls onImport with the saved vehicle.
 export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProps) {
   const [zip, setZip] = useState<File | null>(null)
   const [name, setName] = useState('')
@@ -66,8 +66,8 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
   const [phase, setPhase] = useState<'upload' | 'processing' | 'done'>('upload')
   const [loading, setLoading] = useState(false)
 
-  // ── ZIP-Validierung ──────────────────────────────────────────────────────
-  // Prüft ob die Datei eine ZIP ist und eine .gltf-Datei enthält
+  // ── ZIP Validation ───────────────────────────────────────────────────────
+  // Checks if the file is a ZIP and contains a .gltf file
   async function validateZip(file: File) {
     if (!file.name.toLowerCase().endsWith('.zip')) {
       return 'Please upload ZIP files only'
@@ -141,9 +141,9 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
         setMsg('')
         onClose?.()
       }, 1500)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err)
-      setMsg(err?.message || 'Network error during upload')
+      setMsg(err instanceof Error ? err.message : 'Network error during upload')
       setTimeout(() => setMsg(''), 3000)
     } finally {
       setLoading(false)
@@ -162,15 +162,15 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
       </button>
 
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-slate-900">GLTF Import</h2>
+        <h2 className="text-xl font-bold text-slate-900">Import Vehicle</h2>
         <p className="mt-1 text-sm text-slate-500">
-          Upload ZIP file containing GLTF/GLB, BIN and textures
+          Upload a ZIP file with the 3D vehicle model (GLTF/GLB, BIN and textures)
         </p>
       </div>
 
       <form onSubmit={submit} className="space-y-5">
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-slate-700">Scene Name</label>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">Vehicle Name</label>
           <input
             className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-slate-900 placeholder:text-slate-500 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
             value={name}
@@ -180,7 +180,7 @@ export default function ImportGLTFPage({ onClose, onImport }: ImportGLTFPageProp
           />
         </div>
 
-        {/* ── Datei-Upload ────────────────────────────────────────── */}
+        {/* ── File Upload ─────────────────────────────────────────── */}
         <div>
           <label className="mb-1.5 block text-sm font-medium text-slate-700">ZIP file</label>
           <label className="group flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-8 cursor-pointer transition hover:border-indigo-500 hover:bg-gray-100">

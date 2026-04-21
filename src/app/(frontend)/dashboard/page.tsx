@@ -28,7 +28,6 @@ async function getData() {
     collection: 'scenes',
     where: { createdBy: { equals: user.id } },
     overrideAccess: true,
-    req: { headers: requestHeaders } as any,
   })
   const scenes: Scene[] = result.docs as unknown as Scene[]
 
@@ -73,8 +72,8 @@ export default async function DashboardPage() {
             <div className="flex items-center gap-2">
               <Layers className="h-4 w-4 text-indigo-500" />
               <span className="text-slate-700 text-sm">
-                <span className="font-semibold text-slate-900 text-lg">{scenes.length}</span> Scene
-                {scenes.length !== 1 ? 'n' : ''} saved
+                <span className="font-semibold text-slate-900 text-lg">{scenes.length}</span> Vehicle
+                {scenes.length !== 1 ? 's' : ''} in showroom
               </span>
             </div>
           </section>
@@ -83,7 +82,7 @@ export default async function DashboardPage() {
           <section className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-400">
-                Last Scenes
+                Recent Vehicles
               </h2>
 
               <Link
@@ -95,7 +94,7 @@ export default async function DashboardPage() {
             </div>
 
             {recent.length === 0 ? (
-              <p className="text-sm text-slate-400 py-4 text-center">No scenes found.</p>
+              <p className="text-sm text-slate-400 py-4 text-center">No vehicles found.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {recent.map((scene, i) => (

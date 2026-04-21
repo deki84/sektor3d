@@ -46,7 +46,7 @@ export default function Sidebar({ activePage }: SidebarProps) {
             }`}
           >
             <Layers className="h-4 w-4 shrink-0" />
-            <span>Scenes</span>
+            <span>Showroom</span>
           </Link>
         </nav>
 
@@ -77,7 +77,7 @@ export default function Sidebar({ activePage }: SidebarProps) {
           }`}
         >
           <Layers className="h-5 w-5" />
-          <span>Scenes</span>
+          <span>Showroom</span>
         </Link>
 
         <div className="flex flex-col items-center gap-1 px-6 py-3">

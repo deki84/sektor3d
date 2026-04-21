@@ -63,7 +63,7 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
         setScenes((prev) => prev.map((s) => (s.scene_uuid === tempId ? saved : s)))
       } else {
         setScenes((prev) => prev.filter((s) => s.scene_uuid !== tempId))
-        console.error('Import ok, aber keine id erhalten')
+        console.error('Import ok, but no id received')
       }
       startTransition(() => {
         setOpenImport(false)
@@ -71,7 +71,7 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
       })
     } catch (e) {
       setScenes((prev) => prev.filter((s) => s.scene_uuid !== tempId))
-      console.error('Import fehlgeschlagen:', e)
+      console.error('Import failed:', e)
     }
   }
 
@@ -85,15 +85,15 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
       startTransition(() => router.refresh())
     } catch (e) {
       setScenes(backup)
-      console.error('Löschen fehlgeschlagen:', e)
+      console.error('Delete failed:', e)
     }
   }
 
-  function handleEdit(scene: any) {
+  function handleEdit(scene: Scene) {
     const id = scene?.scene_uuid?.toString?.()
     const url = scene?.gltfFileUrl as string | undefined
     if (!id || !url) {
-      console.error('Fehler: Kann Szene nicht bearbeiten, da scene_uuid oder gltfFileUrl fehlt.')
+      console.error('Error: Cannot edit scene, scene_uuid or gltfFileUrl is missing.')
       return
     }
     router.push(
@@ -104,13 +104,13 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
   return (
     <section className="flex-1 p-6 md:p-10 bg-gray-50 min-h-screen pt-20 md:pt-10">
       <LoadModelViewer />
-      {/* ── Seitenkopf ──────────────────────────────────────────────── */}
+      {/* ── Page Header ─────────────────────────────────────────────── */}
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">My Scenes</h1>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">My Showroom</h1>
           <p className="mt-1 text-sm text-slate-500">
             {scenes.length > 0 &&
-              `${scenes.length} Scene${scenes.length !== 1 ? 's' : ''} available`}
+              `${scenes.length} Vehicle${scenes.length !== 1 ? 's' : ''} in showroom`}
           </p>
         </div>
         <button
@@ -122,7 +122,7 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
         </button>
       </div>
 
-      {/* ── Szenen-Grid ─────────────────────────────────────────────── */}
+      {/* ── Scenes Grid ─────────────────────────────────────────────── */}
       <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {(() => {
           const titleCount = scenes.reduce<Record<string, number>>((acc, s) => {
@@ -159,9 +159,9 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
               />
             </svg>
           </div>
-          <h2 className="text-lg font-semibold text-slate-800">No scenes yet</h2>
+          <h2 className="text-lg font-semibold text-slate-800">No vehicles yet</h2>
           <p className="mt-2 text-sm text-slate-500 max-w-xs">
-            Import your first 3D model to get started. Supports GLTF and GLB files.
+            Import your first 3D vehicle to get started. Supports GLTF and GLB files.
           </p>
         </div>
       )}

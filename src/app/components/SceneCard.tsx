@@ -2,7 +2,7 @@
 
 import { Edit2, Trash2 } from 'lucide-react'
 
-// Prüft ob eine URL auf eine Bilddatei zeigt (und nicht auf eine GLTF/GLB-Datei).
+// Checks whether a URL points to an image file (not a GLTF/GLB file).
 const IMAGE_EXTS = ['.png', '.jpg', '.jpeg', '.webp', '.avif', '.gif']
 function isImageUrl(url?: string): boolean {
   if (!url) return false
@@ -36,15 +36,15 @@ export default function SceneCard({
 }: SceneCardProps) {
   return (
     <article className="group relative rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden transition hover:-translate-y-0.5 hover:shadow-md">
-      {/* ── Vorschau ─────────────────────────────────────────────────── */}
+      {/* ── Preview ──────────────────────────────────────────────────── */}
       {isImageUrl(scene.cover) ? (
-        // echte Thumbnail-URL (PNG/JPG/…) → normales Bild
+        // real thumbnail URL (PNG/JPG/…) → regular image
         <img src={scene.cover} alt={scene.title} className="w-full h-40 object-cover" />
       ) : scene.gltfFileUrl ? (
-        // kein Bild-Cover, aber GLTF vorhanden → statische 3-D-Vorschau
-        // kein auto-rotate, kein camera-controls → verhält sich wie ein Standbild
+        // no image cover, but GLTF available → static 3D preview
+        // no auto-rotate, no camera-controls → behaves like a still image
         <div className="w-full h-40 bg-slate-50">
-          {/* @ts-ignore – Typen in ModelViewerComponent.tsx deklariert */}
+          {/* @ts-ignore – types declared in ModelViewerComponent.tsx */}
           <model-viewer
             src={scene.gltfFileUrl}
             alt={scene.title}
@@ -52,16 +52,11 @@ export default function SceneCard({
             shadow-intensity="0.5"
             exposure="1.0"
             loading="lazy"
-            style={{
-              width: '100%',
-              height: '160px',
-              backgroundColor: 'transparent',
-              pointerEvents: 'none',
-            }}
+            class="w-full h-40 bg-transparent pointer-events-none"
           />
         </div>
       ) : (
-        // kein Cover, kein GLTF → Platzhalter
+        // no cover, no GLTF → placeholder
         <div className="w-full h-40 bg-gradient-to-br from-indigo-50 via-gray-50 to-slate-100 flex items-center justify-center">
           <svg
             className="h-10 w-10 text-indigo-200"
@@ -79,31 +74,31 @@ export default function SceneCard({
         </div>
       )}
 
-      {/* ── Aktions-Buttons (erscheinen beim Hover) ───────────────── */}
+      {/* ── Action buttons (visible on hover) ────────────────────── */}
       {showActions && !isDuplicate && (
         <div className="absolute top-2 right-2 flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           <button
             onClick={() => onEdit?.(scene)}
             className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition hover:bg-indigo-600 hover:text-white"
-            aria-label="Szene bearbeiten"
+            aria-label="Edit scene"
           >
             <Edit2 size={14} />
           </button>
           <button
             onClick={() => onDelete?.(scene)}
             className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition hover:bg-red-500 hover:text-white"
-            aria-label="Szene löschen"
+            aria-label="Delete scene"
           >
             <Trash2 size={14} />
           </button>
         </div>
       )}
 
-      {/* ── Titel ────────────────────────────────────────────────── */}
+      {/* ── Title ────────────────────────────────────────────────── */}
       <div className="px-4 py-3 border-t border-gray-100">
         <h3 className="font-medium text-slate-900 truncate">{scene.title}</h3>
         <p className={`text-xs mt-0.5 ${isDuplicate ? 'text-red-500' : 'text-slate-400'}`}>
-          {isDuplicate ? 'Duplikat' : '3D Scene'}
+          {isDuplicate ? 'Duplicate' : '3D Vehicle'}
         </p>
       </div>
     </article>

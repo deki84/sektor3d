@@ -19,7 +19,8 @@ export default function LoginClient() {
   const [email, setEmail] = useState(prefill)
   const [password, setPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [loadingSignIn, setLoadingSignIn] = useState(false)
+  const [loadingDemo, setLoadingDemo] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
 
@@ -29,14 +30,36 @@ export default function LoginClient() {
   const showEmailErr = submitted ? emailErr : null
   const showPasswordErr = submitted && !emailErr ? passwordErr : null
 
-  const canSubmit = !loading
+  const anyLoading = loadingSignIn || loadingDemo
+
+  async function loginWith(demoEmail: string, demoPassword: string) {
+    setLoadingDemo(true)
+    setServerError(null)
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email: demoEmail, password: demoPassword }),
+      })
+      if (res.ok) {
+        router.replace(nextUrl)
+        return
+      }
+      setServerError('Demo login failed. Please try again.')
+    } catch {
+      setServerError('Network error. Please try again later.')
+    } finally {
+      setLoadingDemo(false)
+    }
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSubmitted(true)
     if (emailErr || passwordErr) return
 
-    setLoading(true)
+    setLoadingSignIn(true)
     setServerError(null)
 
     try {
@@ -57,16 +80,16 @@ export default function LoginClient() {
         return
       }
 
-      let data: any = {}
+      interface LoginResponseData { message?: string; reason?: string }
+      let data: LoginResponseData = {}
       try {
-        data = await res.clone().json()
+        data = (await res.clone().json()) as LoginResponseData
       } catch {
-        data = await res.text()
+        data = { message: await res.text() }
       }
 
       if (
         (res.status === 401 || res.status === 404) &&
-        typeof data === 'object' &&
         data?.reason === 'user-not-found'
       ) {
         router.replace(
@@ -75,11 +98,11 @@ export default function LoginClient() {
         return
       }
 
-      setServerError(typeof data === 'string' ? data : data?.message || 'Login failed.')
+      setServerError(data?.message || 'Login failed.')
     } catch {
       setServerError('Network error. Please try again later.')
     } finally {
-      setLoading(false)
+      setLoadingSignIn(false)
     }
   }
 
@@ -95,7 +118,7 @@ export default function LoginClient() {
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-sm ring-1 ring-white/10">
-          <form className="space-y-5" onSubmit={onSubmit} noValidate aria-busy={loading}>
+          <form className="space-y-5" onSubmit={onSubmit} noValidate>
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700">Email</label>
               <div className="relative">
@@ -130,7 +153,6 @@ export default function LoginClient() {
                   className="absolute inset-y-0 right-3 flex items-center text-slate-500 hover:text-slate-300 transition"
                   onClick={() => setShowPw((v) => !v)}
                   aria-label={showPw ? 'Hide password' : 'Show password'}
-                  aria-pressed={showPw}
                 >
                   {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -146,11 +168,21 @@ export default function LoginClient() {
 
             <button
               type="submit"
-              disabled={!canSubmit}
+              disabled={anyLoading}
               className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 font-semibold text-white shadow-lg shadow-indigo-900/30 transition hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading && <Spinner />}
-              <span>{loading ? 'Signing in…' : 'Sign in'}</span>
+              {loadingSignIn && <Spinner />}
+              <span>{loadingSignIn ? 'Signing in…' : 'Sign in'}</span>
+            </button>
+
+            <button
+              type="button"
+              disabled={anyLoading}
+              onClick={() => loginWith('test@test.de', 'Test12345')}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-indigo-300 bg-white px-4 py-3 font-semibold text-indigo-600 shadow-sm transition hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loadingDemo ? <Spinner /> : <span>🎯</span>}
+              <span>{loadingDemo ? 'Signing in…' : 'Try Demo'}</span>
             </button>
 
             <div className="text-center mt-2">
