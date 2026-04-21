@@ -1,4 +1,4 @@
-// ZIP-Import: Dateien direkt in S3, Szene via Payload Local API
+// ZIP import: files directly to S3, scene via Payload Local API
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
@@ -38,9 +38,9 @@ function getMimeType(filename: string): string {
   return types[path.extname(filename).toLowerCase()] ?? 'application/octet-stream'
 }
 
-// Sucht ein Vorschau-Bild in der ZIP.
-// Priorität 1: Datei mit bekanntem Vorschau-Namen (thumbnail, preview, …).
-// Priorität 2: Erstes Bild im Root-Verzeichnis (kein Unterordner).
+// Finds a preview image in the ZIP.
+// Priority 1: file with a known preview name (thumbnail, preview, …).
+// Priority 2: first image in the root directory (no subdirectory).
 const THUMBNAIL_STEMS = new Set(['thumbnail', 'preview', 'screenshot', 'cover', 'thumb'])
 const IMAGE_EXTS = new Set(['.png', '.jpg', '.jpeg', '.webp'])
 
@@ -55,7 +55,7 @@ function findCoverEntry(entries: AdmZip.IZipEntry[]): AdmZip.IZipEntry | null {
     if (!IMAGE_EXTS.has(ext)) continue
 
     const stem = path.basename(rel, ext).toLowerCase()
-    if (THUMBNAIL_STEMS.has(stem)) return e // sofort zurück bei Treffer
+    if (THUMBNAIL_STEMS.has(stem)) return e // return immediately on match
 
     if (!firstRootImage && !rel.includes('/')) firstRootImage = e
   }
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
     const file = (form.get('file') || form.get('zip')) as File | null
 
     if (!name || !file) {
-      return NextResponse.json({ error: 'name + zip nötig' }, { status: 400 })
+      return NextResponse.json({ error: 'name + zip required' }, { status: 400 })
     }
 
     const payload = await getPayload({ config: configPromise })
@@ -93,12 +93,12 @@ export async function POST(req: Request) {
       },
     })
 
-    // ZIP extrahieren und Dateien in S3 hochladen
+    // Extract ZIP and upload files to S3
     const buf = Buffer.from(await file.arrayBuffer())
     const zip = new AdmZip(buf)
     const entries = zip.getEntries()
 
-    // Vorschau-Bild suchen (vor dem Upload-Loop, damit wir den Key kennen)
+    // Find preview image (before upload loop, so we know the key)
     const coverEntry = findCoverEntry(entries)
 
     let mainGLTF: string | null = null
@@ -123,19 +123,19 @@ export async function POST(req: Request) {
 
     if (!mainGLTF) {
       await payload.delete({ collection: 'scenes', id: scene.id })
-      return NextResponse.json({ error: 'keine .gltf im ZIP' }, { status: 400 })
+      return NextResponse.json({ error: 'no .gltf found in ZIP' }, { status: 400 })
     }
 
-    // Öffentliche URL des Haupt-GLTF zusammenbauen
+    // Build public URL for the main GLTF
     const gltfKey = `scenes/${slug}/${sceneUuid}/${mainGLTF}`
     const gltfUrl = `${process.env.NEXT_PUBLIC_S3_BASE_URL}/${gltfKey}`
 
-    // Cover-URL: Vorschau-Bild aus ZIP (falls vorhanden), sonst leer
+    // Cover URL: preview image from ZIP (if available), otherwise empty
     const coverUrl = coverEntry
       ? `${process.env.NEXT_PUBLIC_S3_BASE_URL}/scenes/${slug}/${sceneUuid}/${sanitize(coverEntry.entryName)}`
       : ''
 
-    // Szene mit finaler URL aktualisieren
+    // Update scene with final URL
     const updated = await payload.update({
       collection: 'scenes',
       id: scene.id,
@@ -151,8 +151,8 @@ export async function POST(req: Request) {
       },
       { status: 200 },
     )
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error('Import Error:', e)
-    return NextResponse.json({ error: e.message }, { status: 500 })
+    return NextResponse.json({ error: e instanceof Error ? e.message : 'Unknown error' }, { status: 500 })
   }
 }

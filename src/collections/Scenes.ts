@@ -38,7 +38,7 @@ export const Scenes: CollectionConfig = {
       required: true,
       defaultValue: 'gltf',
       options: [
-        { label: 'GLTF Datei', value: 'gltf' },
+        { label: 'GLTF File', value: 'gltf' },
         { label: 'Shapespark Link', value: 'shapespark' },
         { label: 'iFrame Embed', value: 'iframe' },
       ],

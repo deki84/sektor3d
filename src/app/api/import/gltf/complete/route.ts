@@ -1,5 +1,20 @@
 export const runtime = 'nodejs'
 
+type SceneData = {
+  scene_uuid?: string
+  title?: string
+  slug?: string
+  viewerType?: 'gltf' | 'shapespark' | 'iframe'
+  originalName?: string
+  size?: number
+  status?: string
+  createdBy?: number
+  gltfFileUrl?: string
+  cover?: string
+  r2Key?: string
+  fileHash?: string
+}
+
 import AdmZip from 'adm-zip'
 import path from 'path'
 import crypto from 'crypto'
@@ -88,7 +103,7 @@ export async function POST(req: Request) {
       })
       if (existing.totalDocs > 0) {
         return NextResponse.json(
-          { error: 'Du hast bereits eine Szene mit diesem Namen.' },
+          { error: 'You already have a scene with this name.' },
           { status: 409 },
         )
       }
@@ -105,7 +120,7 @@ export async function POST(req: Request) {
         size,
         status: 'processing',
         ...(user?.id ? { createdBy: user.id } : {}),
-      } as any,
+      } satisfies SceneData as SceneData,
     })
 
     // Download ZIP from R2
@@ -140,7 +155,7 @@ export async function POST(req: Request) {
         await s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET!, Key: key }))
         await payload.delete({ collection: 'scenes', id: scene.id })
         return NextResponse.json(
-          { error: `Diese Datei wurde bereits als "${hashDuplicate.docs[0].title}" importiert.` },
+          { error: `This file has already been imported as "${hashDuplicate.docs[0].title}".` },
           { status: 409 },
         )
       }
@@ -189,7 +204,7 @@ export async function POST(req: Request) {
     const updated = await payload.update({
       collection: 'scenes',
       id: scene.id,
-      data: { gltfFileUrl, cover, r2Key: key, status: 'ready', fileHash } as any,
+      data: { gltfFileUrl, cover, r2Key: key, status: 'ready', fileHash } satisfies SceneData as SceneData,
     })
 
     // Remove the original ZIP from R2
@@ -203,8 +218,8 @@ export async function POST(req: Request) {
       gltfFileUrl: updated.gltfFileUrl,
       slug: updated.slug,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in /api/import/gltf/complete:', error)
-    return NextResponse.json({ error: error.message ?? 'Internal Server Error' }, { status: 500 })
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal Server Error' }, { status: 500 })
   }
 }

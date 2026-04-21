@@ -1,12 +1,16 @@
 import type { CollectionConfig } from 'payload'
+import type { User } from '../payload-types'
+
+type EmailArgs = { token?: string }
+type AccessArgs = { req: { user: User | null } }
+type DeleteArgs = { req: { user: User | null }; id?: number | string }
 
 export const Users: CollectionConfig = {
   slug: 'users',
   auth: {
     forgotPassword: {
       generateEmailSubject: () => 'Reset your password',
-      // args typed as any because Payload's internal type is not exported
-      generateEmailHTML: (args: any) => {
+      generateEmailHTML: (args: EmailArgs) => {
         const token = args?.token ?? ''
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
         const url = `${baseUrl}/reset-password/${token}`
@@ -26,7 +30,7 @@ export const Users: CollectionConfig = {
     },
     verify: {
       generateEmailSubject: () => 'Please confirm your email',
-      generateEmailHTML: (args: any) => {
+      generateEmailHTML: (args: EmailArgs) => {
         const token = args?.token ?? ''
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
         const url = `${baseUrl}/verify?token=${token}`
@@ -52,12 +56,11 @@ export const Users: CollectionConfig = {
     group: 'System',
   },
   access: {
-    read: ({ req: { user } }: { req: { user: any } }) => Boolean(user?.roles?.includes('admin')),
+    read: ({ req: { user } }: AccessArgs) => Boolean(user?.roles?.includes('admin')),
     create: () => true,
-    update: ({ req: { user } }: { req: { user: any } }) => Boolean(user?.roles?.includes('admin')),
-    delete: (args: any) =>
-      Boolean(args?.req?.user?.roles?.includes('admin')) &&
-      String(args?.req?.user?.id) !== String(args?.id),
+    update: ({ req: { user } }: AccessArgs) => Boolean(user?.roles?.includes('admin')),
+    delete: ({ req: { user }, id }: DeleteArgs) =>
+      Boolean(user?.roles?.includes('admin')) && String(user?.id) !== String(id),
   },
 
   fields: [

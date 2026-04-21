@@ -1,4 +1,4 @@
-// Szene + S3-Dateien löschen via Payload Local API
+// Delete scene + S3 files via Payload Local API
 import { NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
@@ -17,7 +17,7 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ scene_uuid:
   const { scene_uuid } = await ctx.params
   const payload = await getPayload({ config: configPromise })
 
-  // Szene anhand der UUID suchen
+  // Find scene by UUID
   const { docs } = await payload.find({
     collection: 'scenes',
     where: { scene_uuid: { equals: scene_uuid } },
@@ -33,7 +33,7 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ scene_uuid:
   const slug = scene.slug ?? ''
   const prefix = `scenes/${slug ? `${slug}/` : ''}${scene_uuid}/`
 
-  // S3-Dateien des Ordners auflisten und löschen
+  // List and delete S3 files in the folder
   const listed = await s3.send(
     new ListObjectsV2Command({ Bucket: process.env.S3_BUCKET!, Prefix: prefix }),
   )
@@ -46,7 +46,7 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ scene_uuid:
     )
   }
 
-  // Szene aus DB löschen
+  // Delete scene from DB
   await payload.delete({ collection: 'scenes', id: scene.id })
 
   return NextResponse.json({ ok: true })

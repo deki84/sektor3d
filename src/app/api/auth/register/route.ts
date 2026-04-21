@@ -42,8 +42,9 @@ export async function POST(req: Request) {
       { message: 'Registration successful. Please confirm your email.', user },
       { status: 201 },
     )
-  } catch (err: any) {
-    const first = err?.data?.errors?.[0]
+  } catch (err: unknown) {
+    const payloadErr = err as { data?: { errors?: Array<{ field?: string; message?: string }> } }
+    const first = payloadErr?.data?.errors?.[0]
     const field = first?.field
     const message = first?.message
 

@@ -15,13 +15,13 @@ export async function importScene(newScene: Omit<Scene, 'scene_uuid'>) {
 
   if (!res.ok) {
     const text = await res.text().catch(() => '')
-    throw new Error(`Import fehlgeschlagen (${res.status}): ${text}`)
+    throw new Error(`Import failed (${res.status}): ${text}`)
   }
 
   const saved: Scene = await res.json()
 
   if (!saved?.scene_uuid) {
-    throw new Error('Import-Antwort enthält keine id')
+    throw new Error('Import response contains no id')
   }
 
   revalidateTag('scenes', 'max')
@@ -32,7 +32,7 @@ export async function deleteScene(scene_uuid: string) {
   const res = await fetch(`${BASE}/api/delete-scene/${scene_uuid}`, { method: 'DELETE' })
   if (!res.ok) {
     const text = await res.text().catch(() => '')
-    throw new Error(`Löschen fehlgeschlagen (${res.status}): ${text}`)
+    throw new Error(`Delete failed (${res.status}): ${text}`)
   }
 
   revalidateTag('scenes', 'max')

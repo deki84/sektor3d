@@ -1,4 +1,4 @@
-// S3-Storage-Adapter für Media-Uploads
+// S3 storage adapter for media uploads
 import { s3Storage } from '@payloadcms/storage-s3'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
@@ -54,7 +54,7 @@ export default buildConfig({
 
   sharp,
   plugins: [
-    // Media-Uploads gehen direkt in S3
+    // Media uploads go directly to S3
     s3Storage({
       collections: { media: true },
       bucket: process.env.S3_BUCKET!,

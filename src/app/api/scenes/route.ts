@@ -1,7 +1,15 @@
-// Szenen-CRUD via Payload Local API
 import { NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
+
+type SceneCreateData = {
+  title: string
+  cover: string
+  slug: string
+  viewerType: 'gltf'
+  scene_uuid: string
+  createdBy?: number
+}
 
 export async function GET() {
   const payload = await getPayload({ config: configPromise })
@@ -29,11 +37,11 @@ export async function POST(request: Request) {
         viewerType: 'gltf',
         scene_uuid: slug,
         createdBy: user?.id,
-      } as any,
+      } satisfies SceneCreateData as SceneCreateData,
     })
 
     return NextResponse.json(doc, { status: 201 })
-  } catch (e: any) {
-    return NextResponse.json({ error: String(e?.message ?? e) }, { status: 400 })
+  } catch (e: unknown) {
+    return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 400 })
   }
 }
