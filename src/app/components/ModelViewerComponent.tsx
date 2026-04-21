@@ -1,6 +1,9 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, Suspense, useState } from 'react'
+import { Canvas } from '@react-three/fiber'
+import { OrbitControls, Environment, Html, useGLTF, Bounds } from '@react-three/drei'
+import * as THREE from 'three'
 
 interface Props {
   modelUrl: string
@@ -15,136 +18,102 @@ const COLORS = [
   { label: 'Gold', hex: '#c8a415' },
 ]
 
-export default function ModelViewerComponent({ modelUrl }: Props) {
-  const [isLoading, setIsLoading] = useState(true)
-  const [progress, setProgress] = useState(0)
-  const [activeColor, setActiveColor] = useState<string | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const viewerRef = useRef<HTMLElement | null>(null)
+const SKIP_KEYWORDS = [
+  'window', 'glass', 'glas', 'interior', 'wheel',
+  'tire', 'light', 'badge', 'grille', 'engine', 'seat', 'carbon',
+]
 
-  function applyColor(hex: string) {
-    const viewer = viewerRef.current as any
-    if (!viewer?.model) return
+function Model({ url, activeColor }: { url: string; activeColor: string | null }) {
+  const { scene } = useGLTF(url)
 
-    const r = parseInt(hex.slice(1, 3), 16) / 255
-    const g = parseInt(hex.slice(3, 5), 16) / 255
-    const b = parseInt(hex.slice(5, 7), 16) / 255
-    ;(viewer.model.materials as any[]).forEach((mat) => {
-      const name = (mat.name ?? '').toLowerCase()
-      if (
-        name.includes('window') ||
-        name.includes('glass') ||
-        name.includes('glas') ||
-        name.includes('interior') ||
-        name.includes('wheel') ||
-        name.includes('tire') ||
-        name.includes('light') ||
-        name.includes('badge') ||
-        name.includes('grille') ||
-        name.includes('engine') ||
-        name.includes('seat') ||
-        name.includes('carbon')
-      )
-        return
-      mat.pbrMetallicRoughness.setBaseColorFactor([r, g, b, 1])
+  // Apply DoubleSide once on load so interior surfaces are visible
+  useEffect(() => {
+    scene.traverse((obj) => {
+      if (!(obj as THREE.Mesh).isMesh) return
+      const mats = Array.isArray((obj as THREE.Mesh).material)
+        ? ((obj as THREE.Mesh).material as THREE.Material[])
+        : [(obj as THREE.Mesh).material as THREE.Material]
+      mats.forEach((m) => { m.side = THREE.DoubleSide })
     })
-    setActiveColor(hex)
-  }
+  }, [scene])
 
+  // Apply color whenever activeColor changes
   useEffect(() => {
-    if (typeof window !== 'undefined' && !customElements.get('model-viewer')) {
-      import('@google/model-viewer').catch(console.error)
-    }
-  }, [])
+    if (!activeColor) return
+    const color = new THREE.Color(activeColor)
+    scene.traverse((obj) => {
+      if (!(obj as THREE.Mesh).isMesh) return
+      const mats = Array.isArray((obj as THREE.Mesh).material)
+        ? ((obj as THREE.Mesh).material as THREE.Material[])
+        : [(obj as THREE.Mesh).material as THREE.Material]
+      mats.forEach((m) => {
+        if (SKIP_KEYWORDS.some((kw) => m.name.toLowerCase().includes(kw))) return
+        if ((m as THREE.MeshStandardMaterial).color) {
+          ;(m as THREE.MeshStandardMaterial).color.set(color)
+          m.needsUpdate = true
+        }
+      })
+    })
+  }, [scene, activeColor])
 
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
+  return <primitive object={scene} dispose={null} />
+}
 
-    const viewer = container.querySelector('model-viewer') as HTMLElement | null
-    if (!viewer) return
-    viewerRef.current = viewer
-
-    setIsLoading(true)
-    setProgress(0)
-
-    const onLoad = () => {
-      const v = viewerRef.current as any
-      if (v?.model) {
-        v.model.materials.forEach((m: any, i: number) => {
-          console.log(i, m.name)
-        })
-      }
-      setIsLoading(false)
-    }
-    const onProgress = (e: Event) => {
-      const { totalProgress } = (e as CustomEvent<{ totalProgress: number }>).detail
-      setProgress(Math.round(totalProgress * 100))
-    }
-    const onError = (e: Event) => {
-      console.error('model-viewer error:', (e as CustomEvent).detail ?? e)
-      setIsLoading(false)
-    }
-
-    viewer.addEventListener('load', onLoad)
-    viewer.addEventListener('progress', onProgress)
-    viewer.addEventListener('error', onError)
-
-    return () => {
-      viewer.removeEventListener('load', onLoad)
-      viewer.removeEventListener('progress', onProgress)
-      viewer.removeEventListener('error', onError)
-    }
-  }, [modelUrl])
+export default function ModelViewerComponent({ modelUrl }: Props) {
+  const [activeColor, setActiveColor] = useState<string | null>(null)
 
   return (
-    <div ref={containerRef} className="relative w-screen h-screen bg-neutral-100">
+    <div className="relative w-screen h-screen bg-neutral-100">
       {/* Back Button */}
       <button
+        type="button"
         onClick={() => window.history.back()}
         className="absolute top-4 left-4 z-20 flex items-center gap-2 px-4 py-2 rounded-xl bg-white/80 backdrop-blur shadow border border-neutral-200 text-sm font-medium text-neutral-700 hover:bg-white transition"
       >
         ← Back
       </button>
 
-      {/* @ts-expect-error model-viewer is a custom web component */}
-      <model-viewer
-        src={modelUrl}
-        interaction-prompt="none"
-        camera-controls
-        style={{ width: '100%', height: '100%' }}
-      />
+      <Canvas camera={{ fov: 50, near: 0.01 }} style={{ width: '100%', height: '100%' }}>
+        <ambientLight intensity={0.6} />
+        <directionalLight position={[5, 10, 5]} intensity={1} />
+        <Suspense
+          fallback={
+            <Html center>
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-10 h-10 rounded-full border-[3px] border-neutral-300 border-t-neutral-600 animate-spin" />
+                <span className="text-sm font-medium text-neutral-500">Loading model…</span>
+              </div>
+            </Html>
+          }
+        >
+          {/* Bounds auto-fits camera to the model on first load */}
+          <Bounds fit clip observe margin={1.5}>
+            <Model url={modelUrl} activeColor={activeColor} />
+          </Bounds>
+          <Environment preset="city" />
+        </Suspense>
+        <OrbitControls makeDefault enableDamping minDistance={0} />
+      </Canvas>
 
       {/* Color Panel */}
-      {!isLoading && (
-        <div className="color-panel fixed bottom-0 left-0 right-0 z-20 flex justify-center px-4">
-          <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/90 backdrop-blur shadow-lg border border-neutral-200">
-            <span className="text-xs font-medium text-neutral-500 mr-1">Color</span>
-            {COLORS.map((c) => (
-              <button
-                key={c.hex}
-                title={c.label}
-                onClick={() => applyColor(c.hex)}
-                className="w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 active:scale-95"
-                style={{
-                  backgroundColor: c.hex,
-                  borderColor: activeColor === c.hex ? '#000' : 'transparent',
-                }}
-              />
-            ))}
-          </div>
+      <div className="fixed bottom-0 left-0 right-0 z-20 flex justify-center px-4 pb-4">
+        <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/90 backdrop-blur shadow-lg border border-neutral-200">
+          <span className="text-xs font-medium text-neutral-500 mr-1">Color</span>
+          {COLORS.map((c) => (
+            <button
+              key={c.hex}
+              type="button"
+              title={c.label}
+              onClick={() => setActiveColor(c.hex)}
+              className="w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 active:scale-95"
+              style={{
+                backgroundColor: c.hex,
+                borderColor: activeColor === c.hex ? '#000' : 'transparent',
+              }}
+            />
+          ))}
         </div>
-      )}
-
-      {/* Loading overlay */}
-      {isLoading && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-neutral-100">
-          <div className="w-10 h-10 rounded-full border-[3px] border-neutral-300 border-t-neutral-600 animate-spin" />
-          <span className="text-sm font-medium text-neutral-500 tabular-nums tracking-wide">
-            {progress > 0 ? `${progress} %` : 'Loading model…'}
-          </span>
-        </div>
-      )}
+      </div>
     </div>
   )
 }

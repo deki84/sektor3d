@@ -1,26 +1,47 @@
-import type React from 'react'
+// src/types/model-viewer.ts
+import type { DetailedHTMLProps, HTMLAttributes, CSSProperties, ReactNode } from 'react'
 
-declare global {
+export interface ModelViewerElement extends HTMLElement {
+  model?: {
+    materials: Array<{
+      name: string
+      pbrMetallicRoughness: {
+        setBaseColorFactor: (color: [number, number, number, number]) => void
+      }
+    }>
+  }
+  positionAndNormalFromPoint: (
+    x: number,
+    y: number,
+  ) => {
+    position: { toString: () => string }
+  } | null
+}
+
+
+type ModelViewerProps = DetailedHTMLProps<
+  HTMLAttributes<ModelViewerElement> & {
+    src?: string
+    alt?: string
+    'camera-controls'?: boolean | string
+    'environment-image'?: string
+    'shadow-intensity'?: string
+    'shadow-softness'?: string
+    exposure?: string
+    'tone-mapping'?: string
+    loading?: string
+    reveal?: string
+    style?: CSSProperties
+    children?: ReactNode
+  },
+  ModelViewerElement
+>
+
+
+  declare global {
   namespace JSX {
     interface IntrinsicElements {
-      'model-viewer': React.DetailedHTMLProps<
-        React.HTMLAttributes<HTMLElement> & {
-          src?: string
-          alt?: string
-          'environment-image'?: string
-          'shadow-intensity'?: string
-          'shadow-softness'?: string
-          exposure?: string
-          'tone-mapping'?: string
-          'camera-controls'?: '' | boolean
-          loading?: string
-          reveal?: string
-          style?: React.CSSProperties
-        },
-        HTMLElement
-      >
+      'model-viewer': ModelViewerProps
     }
   }
 }
-
-export {}
