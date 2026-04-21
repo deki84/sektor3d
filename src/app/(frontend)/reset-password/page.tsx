@@ -91,13 +91,16 @@ function ResetForm() {
         <form onSubmit={onSubmit} noValidate className="space-y-4">
           {/* New password */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">New password</label>
+            <label htmlFor="new-password" className="block text-sm font-medium text-slate-700 mb-1">New password</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
               <input
+                id="new-password"
                 type={showPw ? 'text' : 'password'}
+                placeholder="Min. 8 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-xl border border-gray-200 bg-white pl-10 pr-11 py-2.5 text-slate-800 placeholder:text-slate-400 shadow-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30"
               />
               {/* Show/hide password */}
               <button
@@ -105,7 +108,6 @@ function ResetForm() {
                 className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600 transition"
                 onClick={() => setShowPw((v) => !v)}
                 aria-label={showPw ? 'Hide password' : 'Show password'}
-                aria-pressed={showPw}
               >
                 {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -117,15 +119,18 @@ function ResetForm() {
 
           {/* Confirm password */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="confirm-password" className="block text-sm font-medium text-slate-700 mb-1">
               Confirm password
             </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
               <input
+                id="confirm-password"
                 type={showConfirm ? 'text' : 'password'}
+                placeholder="Repeat password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
+                className="w-full rounded-xl border border-gray-200 bg-white pl-10 pr-11 py-2.5 text-slate-800 placeholder:text-slate-400 shadow-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30"
               />
               {/* Show/hide confirm password */}
               <button
@@ -133,7 +138,6 @@ function ResetForm() {
                 className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600 transition"
                 onClick={() => setShowConfirm((v) => !v)}
                 aria-label={showConfirm ? 'Hide password' : 'Show password'}
-                aria-pressed={showConfirm}
               >
                 {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>

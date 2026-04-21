@@ -163,7 +163,6 @@ export default function RegisterClient() {
                   className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600 transition"
                   onClick={() => setShowPw((v) => !v)}
                   aria-label={showPw ? 'Hide password' : 'Show password'}
-                  aria-pressed={showPw}
                 >
                   {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -191,7 +190,6 @@ export default function RegisterClient() {
                   className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600 transition"
                   onClick={() => setShowConfirm((v) => !v)}
                   aria-label={showConfirm ? 'Hide password' : 'Show password'}
-                  aria-pressed={showConfirm}
                 >
                   {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
