@@ -1,6 +1,7 @@
 'use client'
 
-import { Edit2, Trash2 } from 'lucide-react'
+import { Edit2, Trash2, XCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 // Checks whether a URL points to an image file (not a GLTF/GLB file).
 const IMAGE_EXTS = ['.png', '.jpg', '.jpeg', '.webp', '.avif', '.gif']
@@ -26,7 +27,6 @@ type SceneCardProps = {
   isDuplicate?: boolean
 }
 
-// ─── SceneCard ────────────────────────────────────────────────────────────────
 export default function SceneCard({
   scene,
   onEdit,
@@ -34,17 +34,47 @@ export default function SceneCard({
   showActions = true,
   isDuplicate = false,
 }: SceneCardProps) {
+  const [showError, setShowError] = useState(false)
+
+  // Timer: Hide error after 3 seconds
+  useEffect(() => {
+    if (showError) {
+      const timer = setTimeout(() => setShowError(false), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [showError])
+
+  const handleDeleteClick = () => {
+    // Check if this is the demo car
+    if (scene.title.toLowerCase() === 'demo_car') {
+      setShowError(true)
+      return
+    }
+    // Normal delete
+    onDelete?.(scene)
+  }
+
   return (
     <article className="group relative rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden transition hover:-translate-y-0.5 hover:shadow-md">
+      {/* ── Error Message Overlay ────────────────────────────────────── */}
+      {showError && (
+        <div className="absolute inset-x-0 top-0 z-50 p-2 animate-in fade-in slide-in-from-top-1 duration-300">
+          <div className="bg-red-500/90 backdrop-blur-sm text-white px-3 py-2 rounded-lg flex items-center gap-2 shadow-lg">
+            {/* Nur das rote X und der Text */}
+            <XCircle size={16} className="flex-shrink-0" />
+            <span className="text-[10px] font-bold uppercase tracking-wider">
+              Demo user cannot delete
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* ── Preview ──────────────────────────────────────────────────── */}
       {isImageUrl(scene.cover) ? (
-        // real thumbnail URL (PNG/JPG/…) → regular image
         <img src={scene.cover} alt={scene.title} className="w-full h-40 object-cover" />
       ) : scene.gltfFileUrl ? (
-        // no image cover, but GLTF available → static 3D preview
-        // no auto-rotate, no camera-controls → behaves like a still image
         <div className="w-full h-40 bg-slate-50">
-          {/* @ts-ignore – types declared in ModelViewerComponent.tsx */}
+          {/* @ts-ignore */}
           <model-viewer
             src={scene.gltfFileUrl}
             alt={scene.title}
@@ -56,7 +86,6 @@ export default function SceneCard({
           />
         </div>
       ) : (
-        // no cover, no GLTF → placeholder
         <div className="w-full h-40 bg-gradient-to-br from-indigo-50 via-gray-50 to-slate-100 flex items-center justify-center">
           <svg
             className="h-10 w-10 text-indigo-200"
@@ -74,7 +103,7 @@ export default function SceneCard({
         </div>
       )}
 
-      {/* ── Action buttons (visible on hover) ────────────────────── */}
+      {/* ── Action buttons ────────────────────── */}
       {showActions && !isDuplicate && (
         <div className="absolute top-2 right-2 flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           <button
@@ -85,7 +114,7 @@ export default function SceneCard({
             <Edit2 size={14} />
           </button>
           <button
-            onClick={() => onDelete?.(scene)}
+            onClick={handleDeleteClick}
             className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-slate-500 shadow-sm backdrop-blur-sm transition hover:bg-red-500 hover:text-white"
             aria-label="Delete scene"
           >
