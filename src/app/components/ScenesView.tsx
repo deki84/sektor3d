@@ -163,6 +163,14 @@ export default function ScenesView({ initialScenes }: ScenesViewProps) {
           <p className="mt-2 text-sm text-slate-500 max-w-xs">
             Import your first 3D vehicle to get started. Supports GLTF and GLB files.
           </p>
+
+          <button
+            onClick={() => setOpenImport(true)}
+            className="mt-6 flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 active:scale-95"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Import</span>
+          </button>
         </div>
       )}
 
